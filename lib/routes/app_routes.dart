@@ -1,0 +1,11 @@
+abstract class AppRoutes {
+  static const String splash = '/splash';
+  static const String signin = '/signin';
+  static const String signup = '/signup';
+  static const String forgot = '/forgot';
+  static const String phoneAuth = '/PhoneAuth';
+  static const String otp = '/OtpScreen';
+  static const String basicinfo = '/BasicInfo';
+  static const String permission = '/PermissionScreen';
+  
+}

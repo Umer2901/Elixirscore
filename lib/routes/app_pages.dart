@@ -1,0 +1,51 @@
+
+
+import 'package:flutter_application_elixirscore/routes/app_routes.dart';
+import 'package:flutter_application_elixirscore/view/basicinfo.dart';
+import 'package:flutter_application_elixirscore/view/forgot.dart';
+import 'package:flutter_application_elixirscore/view/otp.dart';
+import 'package:flutter_application_elixirscore/view/permission.dart';
+import 'package:flutter_application_elixirscore/view/phoneauth.dart';
+import 'package:flutter_application_elixirscore/view/signin.dart';
+import 'package:flutter_application_elixirscore/view/signup.dart';
+import 'package:flutter_application_elixirscore/view/splash.dart';
+import 'package:get/get.dart';
+
+class AppPages extends AppRoutes {
+  static const String initialRoute = AppRoutes.splash;
+  static final routes = [
+    GetPage(
+      name: AppRoutes.splash,
+      page: () => SplashScreen(),
+    ),
+     GetPage(
+      name: AppRoutes.signin,
+      page: () => const Signin(),
+    ),
+     GetPage(
+      name: AppRoutes.signup,
+      page: () => const Signup(),
+    ),
+    GetPage(
+      name: AppRoutes.forgot,
+      page: () => const ForgotScreen(),
+    ),
+     GetPage(
+      name: AppRoutes.phoneAuth,
+      page: () => const PhoneAuth(),
+    ),
+     GetPage(
+      name: AppRoutes.otp,
+      page: () => const OtpScreen(),
+    ),
+    GetPage(
+      name: AppRoutes.basicinfo,
+      page: () => const BasicInfo(),
+    ),
+     GetPage(
+      name: AppRoutes.permission,
+      page: () => const PermissionScreen(),
+    ),
+    
+  ];
+}
