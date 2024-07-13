@@ -17,19 +17,25 @@ class _ForgotScreenState extends State<ForgotScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
+        leading:Padding(
+          padding: const EdgeInsets.all(5.0),
           child: GestureDetector(
-            onTap: (){
+            onTap: () {
               Navigator.pop(context);
             },
             child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.grey,
-                borderRadius: BorderRadius.circular(50,),
-              ),
-              child: const Icon(Icons.arrow_back),
+            decoration: BoxDecoration(
+              color: AppColors.white,
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.grey, width: 2),
             ),
+            child: const Padding(
+              padding: EdgeInsets.only(left: 5),
+              child: Center(
+                child: Icon(Icons.arrow_back_ios),
+              ),
+            ),
+          ),
           ),
         ),
       ),

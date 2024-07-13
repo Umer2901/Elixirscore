@@ -2,10 +2,12 @@
 
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/basicinfo.dart';
+import 'package:flutter_application_elixirscore/view/dashboard.dart';
 import 'package:flutter_application_elixirscore/view/forgot.dart';
 import 'package:flutter_application_elixirscore/view/otp.dart';
 import 'package:flutter_application_elixirscore/view/permission.dart';
 import 'package:flutter_application_elixirscore/view/phoneauth.dart';
+import 'package:flutter_application_elixirscore/view/profile.dart';
 import 'package:flutter_application_elixirscore/view/signin.dart';
 import 'package:flutter_application_elixirscore/view/signup.dart';
 import 'package:flutter_application_elixirscore/view/splash.dart';
@@ -45,6 +47,14 @@ class AppPages extends AppRoutes {
      GetPage(
       name: AppRoutes.permission,
       page: () => const PermissionScreen(),
+    ),
+     GetPage(
+      name: AppRoutes.dashboard,
+      page: () => const Dashboard(),
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileScreen(),
     ),
     
   ];

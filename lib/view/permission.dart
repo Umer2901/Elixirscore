@@ -1,6 +1,10 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
+import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
+import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class PermissionScreen extends StatelessWidget {
@@ -218,6 +222,14 @@ class PermissionScreen extends StatelessWidget {
              )
             ],
           ),
+        ),
+            floatingActionButton: FloatingActionButton(
+          onPressed: () {
+           Get.toNamed(AppRoutes.dashboard);
+          },
+          backgroundColor: AppColors.primary,
+          shape: const CircleBorder(),
+          child: const Icon(Icons.arrow_forward,color: AppColors.white,),
         ),
       );
     });

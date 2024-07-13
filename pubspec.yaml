@@ -44,6 +44,7 @@ dependencies:
   get: ^4.6.6
   pin_input_text_field: ^4.5.1
   sliding_up_panel: ^2.0.0+1
+  semicircle_indicator: ^1.1.1
 
 dev_dependencies:
   flutter_test:

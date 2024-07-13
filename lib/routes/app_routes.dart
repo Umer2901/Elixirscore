@@ -7,5 +7,7 @@ abstract class AppRoutes {
   static const String otp = '/OtpScreen';
   static const String basicinfo = '/BasicInfo';
   static const String permission = '/PermissionScreen';
+  static const String dashboard = '/Dashboard';
+   static const String profile = '/Profile';
   
 }
