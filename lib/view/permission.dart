@@ -42,7 +42,7 @@ class PermissionScreen extends StatelessWidget {
                   SizedBox(height: 1.h),
                   Text(
                     detail,
-                    style: Theme.of(context).textTheme.bodyText2,
+                    style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   SizedBox(height: 2.h),
                   Column(
