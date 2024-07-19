@@ -32,7 +32,7 @@ class PermissionScreen extends StatelessWidget {
                     children: [
                       Text(
                         heading,
-                        style: Theme.of(context).textTheme.headline6?.copyWith(
+                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                           fontSize: 18.sp
                         )
                       ),
