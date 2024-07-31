@@ -46,6 +46,10 @@ dependencies:
   sliding_up_panel: ^2.0.0+1
   semicircle_indicator: ^1.1.1
   device_preview: ^1.1.0
+  sign_in_with_apple: ^6.1.1
+  google_sign_in: ^6.2.1
+  firebase_auth: ^5.1.2
+  firebase_core: ^3.3.0
 
 dev_dependencies:
   flutter_test:
