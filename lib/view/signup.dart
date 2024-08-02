@@ -1,3 +1,6 @@
+
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
@@ -8,6 +11,7 @@ import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dar
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+
 class Signup extends StatefulWidget {
   const Signup({super.key});
 
@@ -19,10 +23,10 @@ class _SignupState extends State<Signup> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
-  bool _obsecurePassword = true; 
-  bool _obsecureConfirmPassword = true; 
-  
-  bool isLoading = false; 
+  bool _obsecurePassword = true;
+  bool _obsecureConfirmPassword = true;
+
+  bool isLoading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -103,7 +107,7 @@ class _SignupState extends State<Signup> {
                     label: "Sign Up",
                     onPressed: () async {
                       setState(() {
-                        isLoading = true; 
+                        isLoading = true;
                       });
 
                       if (_passwordController.text != _confirmPasswordController.text) {
@@ -125,7 +129,11 @@ class _SignupState extends State<Signup> {
                         );
 
                         if (authProvider.user != null) {
-                          Get.offAndToNamed(AppRoutes.dashboard);
+                          Get.offAndToNamed(AppRoutes.phoneAuth, arguments: authProvider.user!.phoneNumber);
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Registration failed. Please try again.')),
+                          );
                         }
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -133,7 +141,7 @@ class _SignupState extends State<Signup> {
                         );
                       } finally {
                         setState(() {
-                          isLoading = false; 
+                          isLoading = false;
                         });
                       }
                     },
@@ -162,7 +170,7 @@ class _SignupState extends State<Signup> {
                         ),
                       ),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),

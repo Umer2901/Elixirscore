@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
@@ -45,7 +45,7 @@ class _SigninState extends State<Signin> {
                     controller: _emailController,
                     name: "email",
                     hintText: "Email Address",
-                    prefixIcon: Icon(Icons.email_outlined),
+                    prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   SizedBox(height: 1.h),
                   Text(
@@ -58,7 +58,7 @@ class _SigninState extends State<Signin> {
                     name: "Password",
                     hintText: "Password",
                     obscureText: obsecurePassword,
-                    prefixIcon: Icon(Icons.lock_outlined),
+                    prefixIcon: const Icon(Icons.lock_outlined),
                     suffixIcon: InkWell(
                       onTap: () {
                         setState(() {
@@ -89,34 +89,30 @@ class _SigninState extends State<Signin> {
                   ),
                   SizedBox(height: 2.h),
                   CustomButton(
-                    isLoading: isLoading,
-                    label: "Sign In",
-                    onPressed: () async {
-                      setState(() {
-                        isLoading = true; 
-                      });
-                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-                      try {
-                        await authProvider.loginWithEmailAndPassword(
-                          context,
-                          _emailController.text,
-                          _passwordController.text,
-                        );
-
-                        if (authProvider.user != null) {
-                          Get.offAndToNamed(AppRoutes.phoneAuth);
-                        }
-                      } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Login failed: $e')),
-                        );
-                      } finally {
-                        setState(() {
-                          isLoading = false; 
-                        });
-                      }
-                    },
-                  ),
+  isLoading: isLoading,
+  label: "Sign In",
+  onPressed: () async {
+    setState(() {
+      isLoading = true; 
+    });
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    try {
+      await authProvider.loginWithEmailAndPassword(
+        context,
+        _emailController.text,
+        _passwordController.text,
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Login failed: $e')),
+      );
+    } finally {
+      setState(() {
+        isLoading = false; 
+      });
+    }
+  },
+),
                   SizedBox(height: 3.h),
                   Row(
                     children: [
