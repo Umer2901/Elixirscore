@@ -39,11 +39,16 @@ dependencies:
   provider: ^6.1.2
   google_fonts:  2.1.1
   semicircle_indicator: ^1.1.1
-  device_preview: ^1.1.0
-  sign_in_with_apple: ^6.1.1
-  google_sign_in: ^6.2.1
-  firebase_auth: ^5.1.2
-  firebase_core: ^3.3.0
+  pin_input_text_field: ^4.4.1
+  loading_indicator: ^3.1.1
+  flutter_form_builder: ^7.7.0
+  flutter_spinkit: ^5.2.1
+  firebase_core: ^2.8.0
+  sign_in_with_apple: ^4.3.0
+  google_sign_in: ^6.0.2
+  firebase_auth: ^4.3.0
+  
+
 
 dev_dependencies:
   flutter_test:
