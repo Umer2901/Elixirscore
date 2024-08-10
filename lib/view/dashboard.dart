@@ -524,7 +524,6 @@ class HealthMetric {
 
   double calculateScore() {
     if (name == "Diet" || name == "Energy Burn" || name == "Steps" || name == "Sunlight") {
-      // Higher is better
       if (value > rangeMax) {
         return 100 - 100 * ((value - rangeMax) / (value - rangeMax + rangeMax - rangeMin)).clamp(0, 100);
       } else if (value < rangeMin) {
@@ -533,7 +532,6 @@ class HealthMetric {
         return 100;
       }
     } else {
-      // Lower is better
       if (value < rangeMin) {
         return 100 - 100 * ((rangeMin - value) / (rangeMin - rangeMax)).clamp(0, 100);
       } else if (value > rangeMax) {
@@ -558,15 +556,15 @@ class Dashboard extends StatefulWidget {
 
 class _DashboardState extends State<Dashboard> {
   // Define initial values for metrics
-  double bmi = 17000.0;
-  double diet = 20000;
-  double energyBurn = 2040;
+  double bmi = 170000.0;
+  double diet = 2000;
+  double energyBurn = 200;
   double heartRate = 690;
   double respiration = 22.5;
   double screenTime = 360;
-  double sleep = 390;
+  double sleep = 3900;
   double steps = 655;
-  double sunlight = 50;
+  double sunlight = 300;
 
   // Function to calculate Elixir Score
   double calculateElixirScore() {
@@ -624,20 +622,22 @@ class _DashboardState extends State<Dashboard> {
                   ),
                 ),
                 SizedBox(height: 2.h),
-                Center(
-                  child: SemicircularIndicator(
-                    strokeWidth: 10.sp,
-                    color: AppColors.primary,
-                    bottomPadding: 0,
-                    child: Text(
-                      elixirScore.toStringAsFixed(1),
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                        fontFamily: AppFont.nexaBold,
-                        fontSize: 45.sp,
-                      ),
-                    ),
-                  ),
-                ),
+              Center(
+  child: SemicircularIndicator(
+    progress: elixirScore/100, 
+    strokeWidth: 10.sp,
+    color: AppColors.primary,
+    bottomPadding: 0,
+    child: Text(
+      elixirScore.toStringAsFixed(1),
+      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+        fontFamily: AppFont.nexaBold,
+        fontSize: 45.sp,
+      ),
+    ),
+  ),
+),
+
                 SizedBox(height: 2.h),
                 Padding(
                   padding: EdgeInsets.only(left: 29.sp, right: 35.sp),
@@ -687,9 +687,7 @@ class _DashboardState extends State<Dashboard> {
                       label: "Sync",
                       onPressed: () {
                         setState(() {
-                          // Update metrics values and recalculate Elixir Score
-                          // For demonstration purposes, these values are static
-                          // Replace with actual dynamic updates
+                         
                         });
                       },
                     ),
