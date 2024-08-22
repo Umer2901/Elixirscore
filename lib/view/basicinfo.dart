@@ -11,7 +11,7 @@ class BasicInfo extends StatefulWidget {
   @override
   State<BasicInfo> createState() => _BasicInfoState();
 }
-
+//done
 class _BasicInfoState extends State<BasicInfo> {
   String selectedGender = '';
   double age = 12;
