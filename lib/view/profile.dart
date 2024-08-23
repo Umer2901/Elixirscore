@@ -13,15 +13,14 @@ class ProfileScreen extends StatefulWidget {
 }
 
 class _ProfileScreenState extends State<ProfileScreen> {
-  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-                  '       Profile',
-                  style: Theme.of(context).textTheme.displaySmall,
-                ),
+          '       Profile',
+          style: Theme.of(context).textTheme.displaySmall,
+        ),
         leading: Padding(
           padding: const EdgeInsets.all(5.0),
           child: GestureDetector(
@@ -29,18 +28,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Navigator.pop(context);
             },
             child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.grey, width: 2),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(left: 5),
-              child: Center(
-                child: Icon(Icons.arrow_back_ios),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.grey, width: 2),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Center(
+                  child: Icon(Icons.arrow_back_ios),
+                ),
               ),
             ),
-          ),
           ),
         ),
       ),
@@ -50,15 +49,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           child: Center(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-             
               children: [
-                Text(
-                  'Azeem Iftikhar',
-                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18.sp
-                  )
-                ),
+                Text('Azeem Iftikhar',
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold, fontSize: 18.sp)),
                 Text(
                   'azeem@elixirscore.com',
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -66,147 +60,159 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(height: 4.h),
                 Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                    'Account Details',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp
-                    )
-                                    ),
-                                     const Icon(Icons.arrow_forward_ios),
+                        Text('Account Details',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp)),
+                        const Icon(Icons.arrow_forward_ios),
                       ],
                     ),
                   ),
                 ),
-             SizedBox(height: 2.h,),
-              Container(
+                SizedBox(
+                  height: 2.h,
+                ),
+                Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                    'Edit Basic Info',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp
-                    )
-                                    ),
-                                     const Icon(Icons.arrow_forward_ios),
+                        Text('Edit Basic Info',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp)),
+                        const Icon(Icons.arrow_forward_ios),
                       ],
                     ),
                   ),
                 ),
-             SizedBox(height: 2.h,),
-              Container(
+                SizedBox(
+                  height: 2.h,
+                ),
+                Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                    'Term of Services',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp
-                    )
-                                    ),
-                                     const Icon(Icons.arrow_forward_ios),
+                        Text('Term of Services',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp)),
+                        const Icon(Icons.arrow_forward_ios),
                       ],
                     ),
                   ),
                 ),
-             SizedBox(height: 2.h,),
-             Container(
+                SizedBox(
+                  height: 2.h,
+                ),
+                Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                    'Privacy Policy',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp
-                    )
-                                    ),
-                                     const Icon(Icons.arrow_forward_ios),
+                        Text('Privacy Policy',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp)),
+                        const Icon(Icons.arrow_forward_ios),
                       ],
                     ),
                   ),
                 ),
-             SizedBox(height: 2.h,),
-              Container(
+                SizedBox(
+                  height: 2.h,
+                ),
+                Container(
                   decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(10),
-                    color: AppColors.grey
-                  ),
+                      borderRadius: BorderRadius.circular(10),
+                      color: AppColors.grey),
                   child: Padding(
                     padding: const EdgeInsets.all(14.0),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                    'Contact us',
-                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14.sp
-                    )
-                                    ),
-                                     const Icon(Icons.arrow_forward_ios),
+                        Text('Contact us',
+                            style: Theme.of(context)
+                                .textTheme
+                                .bodyMedium
+                                ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 14.sp)),
+                        const Icon(Icons.arrow_forward_ios),
                       ],
                     ),
                   ),
                 ),
-             SizedBox(height: 2.h,),
-             CustomButton(label: "Donate", onPressed: (){},backgroundColor: Colors.amber,borderColor: Colors.amber,)
+                SizedBox(
+                  height: 2.h,
+                ),
+                CustomButton(
+                  label: "Donate",
+                  onPressed: () {},
+                  backgroundColor: Colors.amber,
+                  borderColor: Colors.amber,
+                )
               ],
             ),
           ),
         ),
       ),
-       floatingActionButton: Container(
-         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-         decoration: const BoxDecoration(
-           color: Colors.transparent,
-         ),
-         child: GestureDetector(
-           onTap: () {
-             Get.toNamed(AppRoutes.signin);
-           },
-           child: const Row(
-             mainAxisSize: MainAxisSize.min,
-             children: [
-               Text(
-                 "Logout",
-                 style: TextStyle(color: Color.fromARGB(255, 0, 0, 0), fontWeight: FontWeight.bold,
+      floatingActionButton: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+        decoration: const BoxDecoration(
+          color: Colors.transparent,
+        ),
+        child: GestureDetector(
+          onTap: () {
+            Get.toNamed(AppRoutes.signin);
+          },
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                "Logout",
+                style: TextStyle(
+                    color: Color.fromARGB(255, 0, 0, 0),
+                    fontWeight: FontWeight.bold,
                     fontSize: 23),
-               ),
-               SizedBox(width: 5),
-               Icon(Icons.exit_to_app, color: AppColors.primary),
-             ],
-           ),
-         ),
+              ),
+              SizedBox(width: 5),
+              Icon(Icons.exit_to_app, color: AppColors.primary),
+            ],
+          ),
+        ),
       ),
     );
   }

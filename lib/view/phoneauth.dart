@@ -1,11 +1,13 @@
+// ignore_for_file: use_build_context_synchronously
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
-import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dart';
-import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 
 class PhoneAuth extends StatefulWidget {
   const PhoneAuth({super.key});
@@ -15,6 +17,9 @@ class PhoneAuth extends StatefulWidget {
 }
 
 class _PhoneAuthState extends State<PhoneAuth> {
+  final TextEditingController _phoneNumberController = TextEditingController();
+  bool isLoading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,18 +31,18 @@ class _PhoneAuthState extends State<PhoneAuth> {
               Navigator.pop(context);
             },
             child: Container(
-            decoration: BoxDecoration(
-              color: AppColors.white,
-              borderRadius: BorderRadius.circular(10),
-              border: Border.all(color: AppColors.grey, width: 2),
-            ),
-            child: const Padding(
-              padding: EdgeInsets.only(left: 5),
-              child: Center(
-                child: Icon(Icons.arrow_back_ios),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: AppColors.grey, width: 2),
+              ),
+              child: const Padding(
+                padding: EdgeInsets.only(left: 5),
+                child: Center(
+                  child: Icon(Icons.arrow_back_ios),
+                ),
               ),
             ),
-          ),
           ),
         ),
       ),
@@ -49,7 +54,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Two factor Authentication',
+                  'Two Factor Authentication',
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
                 SizedBox(height: 2.h),
@@ -78,7 +83,6 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 ),
                 SizedBox(height: 1.h),
                 const Divider(height: 1),
-                
                 Row(
                   children: [
                     Text(
@@ -87,21 +91,52 @@ class _PhoneAuthState extends State<PhoneAuth> {
                             fontWeight: FontWeight.bold,
                           ),
                     ),
-                    const Expanded(
+                    Expanded(
                       child: CustomTextField(
-                        name: "otp",
-                        hintText: "12345678",
+                        controller: _phoneNumberController,
+                        name: "Phone Number",
+                        hintText: "Enter phone number",
                         borderColor: AppColors.white,
                       ),
                     ),
                   ],
                 ),
-               
                 const Divider(height: 1),
                 SizedBox(height: 3.h),
-                CustomButton(label: "Continue", onPressed: () {
-                   Get.toNamed(AppRoutes.otp);
-                }),
+                CustomButton(
+                  isLoading: isLoading,
+                  label: "Continue",
+                  onPressed: () async {
+                    if (_phoneNumberController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Please enter a phone number')),
+                      );
+                      return;
+                    }
+                    
+                    setState(() {
+                      isLoading = true;
+                    });
+
+                    final phoneNumber = '+1${_phoneNumberController.text}';
+                    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                    
+                    try {
+                      await authProvider.verifyPhoneNumber(context, phoneNumber);
+                     
+
+   
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Verification failed: $e')),
+                      );
+                    } finally {
+                      setState(() {
+                        isLoading = false;
+                      });
+                    }
+                  },
+                ),
               ],
             ),
           ),

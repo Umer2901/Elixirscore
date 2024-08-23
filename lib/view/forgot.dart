@@ -1,6 +1,11 @@
 import 'package:flutter_application_elixirscore/constants/colors.dart';
+import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
+import 'package:flutter_application_elixirscore/providers/loading_provider.dart';
+import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dart';
+import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +17,7 @@ class ForgotScreen extends StatefulWidget {
 }
 
 class _ForgotScreenState extends State<ForgotScreen> {
-  
+  final TextEditingController _emailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -61,7 +66,8 @@ class _ForgotScreenState extends State<ForgotScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                   SizedBox(height: 1.h),
-                const CustomTextField(
+                  CustomTextField(
+                  controller: _emailController,
                   name: 'email',
                   hintText: 'Your email',
                   fillColor: AppColors.white,
@@ -69,7 +75,23 @@ class _ForgotScreenState extends State<ForgotScreen> {
                
                 SizedBox(height: 3.h),
               
-              CustomButton(label: "Send Email", onPressed: (){}),
+                 Consumer<LoadingProvider>(
+                  builder: (context, loadingProvider, child) {
+                    return loadingProvider.isLoading
+                        ? const Center(child: CircularProgressIndicator())
+                        : CustomButton(
+                            onPressed: () async {
+                              final loadingProvider = Provider.of<LoadingProvider>(context, listen: false);
+                              loadingProvider.setLoading(true);
+                              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                              await authProvider.sendPasswordResetEmail(context, _emailController.text);
+                              loadingProvider.setLoading(false);
+                             await Future.delayed(const Duration(seconds: 3));
+                             Get.toNamed(AppRoutes.signin);
+                            }, label:  'Send Code',
+                          );
+                  },
+                ),
                 
                  SizedBox(height: 42.h),
                 Align(
@@ -78,7 +100,7 @@ class _ForgotScreenState extends State<ForgotScreen> {
                     padding: EdgeInsets.only(bottom: 2.h),
                     child: GestureDetector(
                       onTap: (){
-                         
+                          Get.toNamed(AppRoutes.signin);
                       },
                       child: Text.rich(
                         TextSpan(
