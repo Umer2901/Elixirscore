@@ -8,6 +8,7 @@ abstract class AppRoutes {
   static const String basicinfo = '/BasicInfo';
   static const String permission = '/PermissionScreen';
   static const String dashboard = '/Dashboard';
-   static const String profile = '/Profile';
-  
+  static const String profile = '/Profile';
+  static const String termandservices = '/TermandServices';
+  static const String privacy = '/Privacy';
 }

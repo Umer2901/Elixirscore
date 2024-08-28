@@ -1,7 +1,9 @@
 import 'package:flutter_application_elixirscore/constants/colors.dart';
+import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 
@@ -15,6 +17,7 @@ class ProfileScreen extends StatefulWidget {
 class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -82,72 +85,87 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   height: 2.h,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.grey),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Edit Basic Info',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.sp)),
-                        const Icon(Icons.arrow_forward_ios),
-                      ],
+                 GestureDetector(
+                    onTap: () {
+                    Get.toNamed(AppRoutes.basicinfo);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.grey),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Edit Basic Info',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp)),
+                          const Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 2.h,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.grey),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Term of Services',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.sp)),
-                        const Icon(Icons.arrow_forward_ios),
-                      ],
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.termandservices);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.grey),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Term of Services',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp)),
+                          const Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 2.h,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.grey),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Privacy Policy',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.sp)),
-                        const Icon(Icons.arrow_forward_ios),
-                      ],
+                GestureDetector(
+                    onTap: () {
+                    Get.toNamed(AppRoutes.privacy);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.grey),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Privacy Policy',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp)),
+                          const Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -195,7 +213,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           color: Colors.transparent,
         ),
         child: GestureDetector(
-          onTap: () {
+          onTap: () async {
+            await authProvider.signOut(context);
             Get.toNamed(AppRoutes.signin);
           },
           child: Row(
