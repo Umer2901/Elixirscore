@@ -1,12 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_elixirscore/constants/colors.dart';
+import 'package:get/get.dart';
+import 'package:sizer/sizer.dart';
 
 class Privacy extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: Padding(
+                          padding: const EdgeInsets.all(5.0),
+                          child: GestureDetector(
+                            onTap: () {
+                              Get.back();
+                            },
+                            child: Container(
+                              height: 5.h,
+                              width: 10.w,
+                              decoration: BoxDecoration(
+                                color: AppColors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                border: Border.all(color: AppColors.grey, width: 2),
+                              ),
+                              child: const Padding(
+                                padding: EdgeInsets.only(left: 5),
+                                child: Center(
+                child: Icon(Icons.arrow_back_ios),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                 
         title: Text(
-          'ElixirScore App Privacy Policy',
+          'ElixirScore Privacy Policy',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),

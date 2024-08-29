@@ -71,11 +71,8 @@ class _BasicInfoState extends State<BasicInfo> {
         ),
         floatingActionButton: FloatingActionButton(
           onPressed: () async {
-            // Get the provider instance
             final provider = Provider.of<BasicInfoProvider>(context, listen: false);
-            // Save the information
             await provider.updateBasicInfo(selectedGender, age, height, weight);
-            // Navigate to the next screen
             Get.toNamed(AppRoutes.permission);
           },
           backgroundColor: AppColors.primary,

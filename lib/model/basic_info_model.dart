@@ -6,6 +6,8 @@ class BasicInfoModel {
   final double age;
   final double height;
   final double weight;
+  final String email;
+  final String phoneNumber;
 
   BasicInfoModel({
     required this.uid,
@@ -13,6 +15,8 @@ class BasicInfoModel {
     required this.age,
     required this.height,
     required this.weight,
+    required this.email,
+    required this.phoneNumber,
   });
 
   Map<String, dynamic> toMap() {
@@ -22,6 +26,8 @@ class BasicInfoModel {
       'age': age,
       'height': height,
       'weight': weight,
+      'email': email,
+      'phoneNumber': phoneNumber,
     };
   }
 
@@ -32,9 +38,10 @@ class BasicInfoModel {
       age: map['age'],
       height: map['height'],
       weight: map['weight'],
+      email: map['email'],
+      phoneNumber: map['phoneNumber'],
     );
   }
-
 
   Future<void> saveToFirestore() async {
     final userDoc = FirebaseFirestore.instance.collection('basic_info').doc(uid);

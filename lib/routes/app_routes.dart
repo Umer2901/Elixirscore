@@ -11,4 +11,7 @@ abstract class AppRoutes {
   static const String profile = '/Profile';
   static const String termandservices = '/TermandServices';
   static const String privacy = '/Privacy';
+  static const String updatebasicinfo = '/UpdateBasicInfo';
+  static const String accountinfo = '/AccountInfo';
+  
 }

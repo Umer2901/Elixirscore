@@ -8,8 +8,10 @@ import 'package:flutter_application_elixirscore/view/otp.dart';
 import 'package:flutter_application_elixirscore/view/permission.dart';
 import 'package:flutter_application_elixirscore/view/phoneauth.dart';
 import 'package:flutter_application_elixirscore/view/profile.dart';
+import 'package:flutter_application_elixirscore/view/profile/account_info.dart';
 import 'package:flutter_application_elixirscore/view/profile/privacy.dart';
 import 'package:flutter_application_elixirscore/view/profile/term_of_services.dart';
+import 'package:flutter_application_elixirscore/view/profile/update_basic_info.dart';
 import 'package:flutter_application_elixirscore/view/signin.dart';
 import 'package:flutter_application_elixirscore/view/signup.dart';
 import 'package:flutter_application_elixirscore/view/splash.dart';
@@ -65,6 +67,14 @@ class AppPages extends AppRoutes {
      GetPage(
       name: AppRoutes.privacy,
       page: () => Privacy(),
+    ),
+    GetPage(
+      name: AppRoutes.updatebasicinfo,
+      page: () => const UpdateBasicInfo(),
+    ),
+     GetPage(
+      name: AppRoutes.accountinfo,
+      page: () => const AccountInfo(),
     ),
     
   ];

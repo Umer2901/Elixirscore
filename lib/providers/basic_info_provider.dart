@@ -21,14 +21,19 @@ class BasicInfoProvider with ChangeNotifier {
   }
 
   Future<void> updateBasicInfo(String gender, double age, double height, double weight) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid != null) {
+    final user = _auth.currentUser;
+    if (user != null) {
+      final email = user.email ?? '';
+      final phoneNumber = user.phoneNumber ?? '';
+
       _basicInfo = BasicInfoModel(
-        uid: uid,
+        uid: user.uid,
         selectedGender: gender,
         age: age,
         height: height,
         weight: weight,
+        email: email,
+        phoneNumber: phoneNumber,
       );
       await _basicInfo!.saveToFirestore();
       notifyListeners();
