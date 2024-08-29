@@ -161,6 +161,8 @@ class _DashboardState extends State<Dashboard> {
     return Sizer(builder: (context, orientation, deviceType) {
       return Scaffold(
         appBar: AppBar(
+          scrolledUnderElevation: 0.0,
+          surfaceTintColor: Colors.white,
           leading: IconButton(
             onPressed: () {
               Get.toNamed(AppRoutes.profile);

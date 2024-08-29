@@ -60,14 +60,7 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-    <key>UIBackgroundModes</key>
-    <array>
-        <string>fetch</string>
-        <string>remote-notification</string>
-    </array>
-    <key>NSAppUsageDescription</key>
-    <string>We need access to notifications to keep you updated.</string>
-    <key>NSUsageDescription</key>
-    <string>We need access to track usage to provide you with insights and usage statistics.</string>
+	<key>UIApplicationSupportsIndirectInputEvents</key>
+	<true/>
 </dict>
 </plist>
