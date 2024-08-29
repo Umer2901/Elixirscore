@@ -6,6 +6,7 @@ import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
+import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -43,7 +44,68 @@ class _SignupState extends State<Signup> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(child: Image.asset(AppImages.logo, height: 30.h, width: 50.w)),
-                  // Other widgets...
+                   Text(
+                    "Email Address",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
+                  ),
+                  SizedBox(height: 1.h),
+                  CustomTextField(
+                    controller: _emailController,
+                    name: "email",
+                    hintText: "Email Address",
+                    prefixIcon: const Icon(Icons.email_outlined),
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    "Password",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
+                  ),
+                  SizedBox(height: 1.h),
+                  CustomTextField(
+                    controller: _passwordController,
+                    name: "Password",
+                    hintText: "Password",
+                    obscureText: _obsecurePassword,
+                    prefixIcon: const Icon(Icons.lock_outlined),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _obsecurePassword = !_obsecurePassword;
+                        });
+                      },
+                      child: Icon(
+                        _obsecurePassword
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 1.h),
+                  Text(
+                    "Password Confirmation",
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
+                  ),
+                  SizedBox(height: 1.h),
+                  CustomTextField(
+                    controller: _confirmPasswordController,
+                    name: "Confirm Password",
+                    hintText: "Confirm Password",
+                    obscureText: _obsecureConfirmPassword,
+                    prefixIcon: const Icon(Icons.lock_outlined),
+                    suffixIcon: InkWell(
+                      onTap: () {
+                        setState(() {
+                          _obsecureConfirmPassword = !_obsecureConfirmPassword;
+                        });
+                      },
+                      child: Icon(
+                        _obsecureConfirmPassword
+                            ? Icons.visibility_off_rounded
+                            : Icons.visibility_rounded,
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 3.h),
                   CustomButton(
                     isLoading: isLoading,
                     label: "Sign Up",

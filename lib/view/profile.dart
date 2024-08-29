@@ -4,6 +4,7 @@ import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/material.dart';
 
@@ -207,32 +208,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
       ),
-      floatingActionButton: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: const BoxDecoration(
-          color: Colors.transparent,
+     floatingActionButton: Container(
+  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+  decoration: const BoxDecoration(
+    color: Colors.transparent,
+  ),
+  child: GestureDetector(
+    onTap: () async {
+      await authProvider.signOut(context);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('isLoggedIn', false);
+      Get.offAllNamed(AppRoutes.signin);
+    },
+    child: const Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          "Logout",
+          style: TextStyle(
+              color: Color.fromARGB(255, 0, 0, 0),
+              fontWeight: FontWeight.bold,
+              fontSize: 23),
         ),
-        child: GestureDetector(
-          onTap: () async {
-            await authProvider.signOut(context);
-            Get.toNamed(AppRoutes.signin);
-          },
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                "Logout",
-                style: TextStyle(
-                    color: Color.fromARGB(255, 0, 0, 0),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 23),
-              ),
-              SizedBox(width: 5),
-              Icon(Icons.exit_to_app, color: AppColors.primary),
-            ],
-          ),
-        ),
-      ),
+        SizedBox(width: 5),
+        Icon(Icons.exit_to_app, color: AppColors.primary),
+      ],
+    ),
+  ),
+),
+
     );
   }
 }
