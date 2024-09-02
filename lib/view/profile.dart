@@ -1,3 +1,4 @@
+import 'package:flutter/widgets.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
@@ -189,36 +190,41 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   height: 2.h,
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: AppColors.grey),
-                  child: Padding(
-                    padding: const EdgeInsets.all(14.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Contact us',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 14.sp)),
-                        const Icon(Icons.arrow_forward_ios),
-                      ],
+                GestureDetector(
+                  onTap: () {
+                    Get.toNamed(AppRoutes.contact);
+                  },
+                  child: Container(
+                    decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: AppColors.grey),
+                    child: Padding(
+                      padding: const EdgeInsets.all(14.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text('Contact us',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodyMedium
+                                  ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 14.sp)),
+                          const Icon(Icons.arrow_forward_ios),
+                        ],
+                      ),
                     ),
                   ),
                 ),
                 SizedBox(
                   height: 2.h,
                 ),
-                CustomButton(
-                  label: "Donate",
-                  onPressed: () {},
-                  backgroundColor: Colors.amber,
-                  borderColor: Colors.amber,
-                )
+                // CustomButton(
+                //   label: "Donate",
+                //   onPressed: () {},
+                //   backgroundColor: Colors.amber,
+                //   borderColor: Colors.amber,
+                // )
               ],
             ),
           ),

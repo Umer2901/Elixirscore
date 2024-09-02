@@ -1,16 +1,26 @@
-// ignore_for_file: deprecated_member_use
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:sizer/sizer.dart';
 
-class PermissionScreen extends StatelessWidget {
+class PermissionScreen extends StatefulWidget {
   const PermissionScreen({super.key});
 
-  void showCustomPanel(BuildContext context, String heading, String detail) {
+  @override
+  _PermissionScreenState createState() => _PermissionScreenState();
+}
+
+class _PermissionScreenState extends State<PermissionScreen> {
+  final Map<String, bool> permissions = {
+    'Apple Health': false,
+    'Notification': false,
+    'Screen Time': false,
+  };
+
+  void showCustomPanel(BuildContext context, String permissionKey, String heading, String detail) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -50,8 +60,8 @@ class PermissionScreen extends StatelessWidget {
                     children: [
                       CustomButton(
                         label: "Enable",
-                        onPressed: () {
-                          // Handle enable action
+                        onPressed: () async {
+                          await _requestPermission(permissionKey);
                           Navigator.of(context).pop();
                         },
                       ),
@@ -78,6 +88,35 @@ class PermissionScreen extends StatelessWidget {
     );
   }
 
+  Future<void> _requestPermission(String permissionKey) async {
+    PermissionStatus status;
+    switch (permissionKey) {
+      case 'Apple Health':
+        // Replace with actual health permission request if available
+        status = await Permission.activityRecognition.request();
+        break;
+      case 'Notification':
+        status = await Permission.notification.request();
+        break;
+      case 'Screen Time':
+        // Replace with actual screen time permission request if available
+        status = await Permission.accessMediaLocation.request();
+        break;
+      default:
+        return;
+    }
+
+    if (status.isGranted) {
+      setState(() {
+        permissions[permissionKey] = true;
+      });
+    } else {
+      setState(() {
+        permissions[permissionKey] = false;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Sizer(builder: (context, orientation, deviceType) {
@@ -102,136 +141,100 @@ class PermissionScreen extends StatelessWidget {
               SizedBox(
                 height: 6.h,
               ),
-             Padding(
-               padding: const EdgeInsets.all(8.0),
-               child: Column(
-                children: [
-                   Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: AppColors.grey,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 1.h,
-                        ),
-                        Text(
-                          'Apple Health              ❤️',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18.sp,
-                              ),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        CustomButton(
-                          height: 6.h,
-                          label: "Enable",
-                          onPressed: () {
-                            showCustomPanel(
-                                context, 'Apple Health', 'The Health app gathers health data from your iPhone, iPad, Apple Watch, and apps that you already use, so you can view all your progress in one convenient place. Health automatically counts your steps, walking, and running distances. And, if you have an Apple Watch, it automatically tracks your Activity data.');
-                          },
-                        )
-                      ],
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Column(
+                  children: [
+                    _buildPermissionCard(
+                      context,
+                      'Apple Health',
+                      '❤️',
+                      'The Health app gathers health data from your iPhone...',
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: AppColors.grey,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 1.h,
-                        ),
-                        Text(
-                          'Notification                 🔔',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18.sp,
-                              ),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        CustomButton(
-                           height: 6.h,
-                          label: "Enable",
-                          onPressed: () {
-                            showCustomPanel(
-                                context, 'Notification', 'To help you keep track of your health data over time, Health can alert you to significant changes in types of data like resting heart rate, number of steps, and amount of sleep. Trend lines show you how much these metrics have changed and for how long.');
-                          },
-                        )
-                      ],
+                    SizedBox(
+                      height: 2.h,
                     ),
-                  ),
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Container(
-                  width: double.infinity,
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(20),
-                    color: AppColors.grey,
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 1.h,
-                        ),
-                        Text(
-                          'Screen Time                 📱️',
-                          style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                fontWeight: FontWeight.normal,
-                                fontSize: 18.sp,
-                              ),
-                        ),
-                        SizedBox(
-                          height: 2.h,
-                        ),
-                        CustomButton(
-                           height: 6.h,
-                          label: "Enable",
-                          onPressed: () {
-                            showCustomPanel(
-                                context, 'Screen Time', 'Screen time is the amount of time spent using a device with a screen such as a smartphone, computer, television, video game console, or even a tablet. The concept is under significant research with related concepts in digital media use and mental health');
-                          },
-                        )
-                      ],
+                    _buildPermissionCard(
+                      context,
+                      'Notification',
+                      '🔔',
+                      'To help you keep track of your health data...',
                     ),
-                  ),
+                    SizedBox(
+                      height: 2.h,
+                    ),
+                    _buildPermissionCard(
+                      context,
+                      'Screen Time',
+                      '📱️',
+                      'Screen time is the amount of time spent using a device...',
+                    ),
+                  ],
                 ),
-                ],
-               ),
-             )
+              ),
             ],
           ),
         ),
-            floatingActionButton: FloatingActionButton(
+        floatingActionButton: FloatingActionButton(
           onPressed: () {
-           Get.toNamed(AppRoutes.dashboard);
+            if (_allPermissionsGranted()) {
+              Get.toNamed(AppRoutes.dashboard);
+            } else {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text('Please enable all permissions before proceeding.')),
+              );
+            }
           },
           backgroundColor: AppColors.primary,
           shape: const CircleBorder(),
-          child: const Icon(Icons.arrow_forward,color: AppColors.white,),
+          child: const Icon(Icons.arrow_forward, color: AppColors.white),
         ),
       );
     });
   }
+
+  bool _allPermissionsGranted() {
+    return permissions.values.every((permission) => permission);
+  }
+
+  Widget _buildPermissionCard(
+    BuildContext context, String permissionKey, String emoji, String detail) {
+  return Container(
+    width: double.infinity,
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(20),
+      color: permissions[permissionKey] == true ? AppColors.primary : AppColors.grey,
+    ),
+    child: Padding(
+      padding: const EdgeInsets.all(12.0),
+      child: Column(
+        children: [
+          SizedBox(
+            height: 1.h,
+          ),
+          Text(
+            '$permissionKey                 $emoji',
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                  fontWeight: FontWeight.normal,
+                  fontSize: 18.sp,
+                ),
+          ),
+          SizedBox(
+            height: 2.h,
+          ),
+          CustomButton(
+            height: 6.h,
+            label: permissions[permissionKey] == true ? "Enabled" : "Enable",
+            onPressed: permissions[permissionKey] == true
+                ? () {}  // Provide an empty function if the permission is already enabled
+                : () {
+                    showCustomPanel(
+                        context, permissionKey, permissionKey, detail);
+                  },
+          )
+        ],
+      ),
+    ),
+  );
+}
 }

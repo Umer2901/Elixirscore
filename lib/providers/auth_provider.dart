@@ -4,6 +4,7 @@ import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/signin.dart';
 import 'package:get/get.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:sign_in_with_apple/sign_in_with_apple.dart';
 
 // ignore_for_file: use_build_context_synchronously
@@ -27,7 +28,10 @@ class AuthProvider with ChangeNotifier {
       _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
     }
   }
-
+Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
   Future<void> loginWithEmailAndPassword(BuildContext context, String email, String password) async {
   try {
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -75,6 +79,7 @@ class AuthProvider with ChangeNotifier {
 
       UserCredential userCredential = await _auth.signInWithCredential(credential);
       _user = userCredential.user;
+      await _setLoginStatus(true);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
@@ -99,6 +104,7 @@ class AuthProvider with ChangeNotifier {
 
       UserCredential userCredential = await _auth.signInWithCredential(oauthCredential);
       _user = userCredential.user;
+      await _setLoginStatus(true);
       notifyListeners();
     } on FirebaseAuthException catch (e) {
       _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');

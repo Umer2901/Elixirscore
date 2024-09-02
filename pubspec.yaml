@@ -52,6 +52,7 @@ dependencies:
   permission_handler: ^11.3.1
   shared_preferences: ^2.2.3
   health: ^8.0.0
+  screen_time_api_ios: ^0.0.4
   
 
 

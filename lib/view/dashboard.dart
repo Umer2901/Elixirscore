@@ -17,16 +17,15 @@ class HealthMetric {
   HealthMetric(this.name, this.value, this.weight, this.scoreRanges);
 
   double calculateScore() {
-    double score = 0.0;
-
     for (var range in scoreRanges) {
       if (value >= range[0] && value <= range[1]) {
-        score = _calculateScoreForRange(value, range);
-        break;
+        return _calculateScoreForRange(value, range);
       }
     }
-
-    return score;
+    if (value < scoreRanges.first[0]) {
+      return scoreRanges.first[2];
+    }
+    return scoreRanges.last[3];
   }
 
   double _calculateScoreForRange(double value, List<double> range) {
@@ -44,11 +43,15 @@ class HealthMetric {
     return minScore + normalizedValue * scoreRangeSize;
   }
 
+  double getPercentage() {
+    double score = calculateScore();
+    return score.clamp(0, 100);
+  }
+
   double weightedScore() {
     return (calculateScore() * weight) / 100;
   }
 }
-
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -58,18 +61,16 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
-  double bmi = 10000.0;
-  double diet = 2000;
-  double energyBurn = 200;
-  double heartRate = 0;
-  double respiration = 22.5;
-  double screenTime = 360;
-  double sleep = 200;
-  double steps = 0;
-  double sunlight = 0;
+  double bmi = 24.9;            // Within the 18.5 - 24.9 range
+  double energyBurn = 3500.0;   // Within the 2000 - 3500 range
+  double heartRate = 80.0;      // Within the 40 - 80 bpm range
+  double respiration = 20.0;    // Within the 12 - 20 breaths/min range
+  double screenTime = 2;        // Within the 1 - 2 hours range
+  double sleep = 8.0;           // Within the 6 - 8 hours range
+  double steps = 15000.0;       // Within the 10,000 - 15,000 steps range
+  double sunlight = 8.0;        // Within the 1 - 8 hours range
 
-  // Define the list of health data types
-  List<HealthDataType> types = [
+  final List<HealthDataType> types = [
     HealthDataType.BODY_MASS_INDEX,
     HealthDataType.ACTIVE_ENERGY_BURNED,
     HealthDataType.HEART_RATE,
@@ -86,19 +87,18 @@ class _DashboardState extends State<Dashboard> {
 
   Future<void> fetchHealthData() async {
     final health = HealthFactory();
-
     bool accessWasGranted = await health.requestAuthorization(types);
 
     if (accessWasGranted) {
       try {
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          DateTime.now().subtract(Duration(days: 1)),
+          DateTime.now().subtract(const Duration(days: 1)),
           DateTime.now(),
           types,
         );
 
-        for (var data in healthData) {
-          setState(() {
+        setState(() {
+          for (var data in healthData) {
             switch (data.type) {
               case HealthDataType.BODY_MASS_INDEX:
                 bmi = _convertToDouble(data.value);
@@ -121,8 +121,9 @@ class _DashboardState extends State<Dashboard> {
               default:
                 break;
             }
-          });
-        }
+          }
+          sunlight = 8.0; // Placeholder value for sunlight
+        });
       } catch (e) {
         print("Error fetching health data: $e");
       }
@@ -131,7 +132,6 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
-  // Helper method to safely convert to double
   double _convertToDouble(Object value) {
     if (value is int) {
       return value.toDouble();
@@ -140,78 +140,101 @@ class _DashboardState extends State<Dashboard> {
     } else if (value is String) {
       return double.tryParse(value) ?? 0.0;
     } else {
-      return 0.0; // Default value in case of unsupported type
+      return 0.0;
     }
   }
 
   double calculateElixirScore() {
     List<HealthMetric> metrics = [
-      HealthMetric("BMI", bmi, 50, [
-        [0, 18.5, 0, 60],
+      HealthMetric("BMI", bmi, 5, [
+        [10, 18.5, 0, 60],
         [18.5, 24.9, 60, 100],
         [24.9, 30, 100, 60],
         [30, 50, 60, 0],
       ]),
-      HealthMetric("Diet", diet, 10, [
-        [0, 2000, 0, 60],
-        [2000, 3000, 60, 100],
-        [3000, 4000, 100, 60],
-        [4000, 5000, 60, 0],
-      ]),
       HealthMetric("Energy Burn", energyBurn, 15, [
-        [0, 200, 0, 60],
-        [200, 400, 60, 100],
-        [400, 600, 100, 60],
-        [600, 800, 60, 0],
+        [1000, 2000, 0, 60],
+        [2000, 3500, 60, 100],
+        [3500, 5000, 100, 60],
+        [5000, 8000, 60, 0],
       ]),
       HealthMetric("Heart Rate", heartRate, 10, [
-        [0, 50, 0, 60],
-        [50, 80, 60, 100],
+        [0, 40, 0, 100],
+        [40, 80, 100, 100],
         [80, 100, 100, 60],
-        [100, 150, 60, 0],
+        [100, 140, 60, 0],
       ]),
       HealthMetric("Respiration", respiration, 5, [
-        [0, 12, 0, 60],
-        [12, 25, 60, 100],
-        [25, 35, 100, 60],
-        [35, 45, 60, 0],
+        [8, 12, 0, 60],
+        [12, 20, 60, 100],
+        [20, 25, 100, 60],
+        [25, 30, 60, 0],
       ]),
       HealthMetric("Screen Time", screenTime, 15, [
-        [0, 60, 0, 60],
-        [60, 120, 60, 100],
-        [120, 180, 100, 60],
-        [180, 240, 60, 0],
+        [0, 1, 0, 80],
+        [1, 2, 80, 100],
+        [2, 4, 100, 20],
+        [4, 16, 20, 0],
       ]),
       HealthMetric("Sleep", sleep, 20, [
-        [0, 420, 0, 60],
-        [420, 540, 60, 100],
-        [540, 660, 100, 60],
-        [660, 800, 60, 0],
+        [4, 6, 0, 60],
+        [6, 8, 60, 100],
+        [8, 10, 100, 60],
+        [10, 12, 60, 0],
       ]),
       HealthMetric("Steps", steps, 10, [
-        [0, 7000, 0, 60],
-        [7000, 10000, 60, 100],
-        [10000, 13000, 100, 60],
-        [13000, 20000, 60, 0],
+        [0, 5000, 0, 60],
+        [5000, 10000, 60, 100],
+        [10000, 15000, 100, 100],
+        [15000, 30000, 100, 100],
       ]),
       HealthMetric("Sunlight", sunlight, 10, [
-        [0, 30, 0, 60],
-        [30, 60, 60, 100],
-        [60, 90, 100, 60],
-        [90, 120, 60, 0],
+        [0, 1, 0, 100],
+        [1, 4, 100, 100],
+        [4, 6, 100, 100],
+        [6, 8, 100, 100],
       ]),
     ];
 
-    double totalWeightedScore = metrics.map((m) => m.weightedScore()).reduce((a, b) => a + b);
-    double totalWeight = metrics.map((m) => m.weight).reduce((a, b) => a + b);
-    return (totalWeightedScore / totalWeight) * 100;
+    double totalWeightedScore = 0.0;
+    double totalWeight = 0.0;
+
+    for (var metric in metrics) {
+      double score = metric.weightedScore();
+      totalWeightedScore += score;
+      totalWeight += metric.weight;
+    }
+
+    // Normalize the score by ensuring totalWeight is 100
+    if (totalWeight > 0) {
+      return (totalWeightedScore / totalWeight) * 100;  // Convert to percentage
+    } else {
+      return 0.0;
+    }
+  }
+
+  void updateMetricValues(double newBmi, double newEnergyBurn, double newHeartRate, double newRespiration, double newScreenTime, double newSleep, double newSteps, double newSunlight) {
+    setState(() {
+      bmi = newBmi;
+      energyBurn = newEnergyBurn;
+      heartRate = newHeartRate;
+      respiration = newRespiration;
+      screenTime = newScreenTime;
+      sleep = newSleep;
+      steps = newSteps;
+      sunlight = newSunlight;
+    });
   }
 
   Color getColorForScore(double percentage) {
-    if (percentage <= 33.3) return Colors.red;
-    if (percentage >= 33.4 && percentage <= 66.6) return Colors.green;
-    return Colors.blue; // For percentages greater than 66.7
+    if (percentage <= 33.3)
+      return AppColors.red;
+    else if (percentage <= 66.6)
+      return AppColors.green;
+    else
+      return AppColors.primary;
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -237,36 +260,36 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
         body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(8.sp),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'ElixirScore',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                      fontFamily: AppFont.nexaBold,
-                      fontSize: 30.sp,
-                    ),
-                  ),
-                ),
-                SizedBox(height: 2.h),
-                Center(
-                  child: SemicircularIndicator(
-                    progress: elixirScore / 100,
-                    strokeWidth: 10.sp,
-                    color: getColorForScore(elixirScore),
-                    bottomPadding: 0,
-                    child: Text(
-                      elixirScore.toStringAsFixed(1),
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+        child: Padding(
+          padding: EdgeInsets.all(8.sp),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Text(
+                  'ElixirScore',
+                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
                         fontFamily: AppFont.nexaBold,
-                        fontSize: 45.sp,
+                        fontSize: 30.sp,
                       ),
-                    ),
+                ),
+              ),
+              SizedBox(height: 2.h),
+              Center(
+                child: SemicircularIndicator(
+                  progress: elixirScore / 100,
+                  strokeWidth: 10.sp,
+                  color: getColorForScore(elixirScore),
+                  bottomPadding: 0,
+                  child: Text(
+                    elixirScore.toStringAsFixed(1),
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          fontFamily: AppFont.nexaBold,
+                          fontSize: 45.sp,
+                        ),
                   ),
                 ),
+              ),
                 SizedBox(height: 2.h),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 29.sp),
@@ -276,16 +299,16 @@ class _DashboardState extends State<Dashboard> {
                       Text(
                         'Unhealthy',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontFamily: AppFont.nexaBold,
-                          color: AppColors.grey,
-                        ),
+                              fontFamily: AppFont.nexaBold,
+                              color: AppColors.grey,
+                            ),
                       ),
                       Text(
                         'Healthy',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                          fontFamily: AppFont.nexaBold,
-                          color: AppColors.primary,
-                        ),
+                              fontFamily: AppFont.nexaBold,
+                              color: AppColors.primary,
+                            ),
                       ),
                     ],
                   ),
@@ -301,11 +324,16 @@ class _DashboardState extends State<Dashboard> {
                           'Scoring Factors',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
                         ),
-                        Text(
-                          'Learn more',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.primary,
-                            fontWeight: FontWeight.bold,
+                        GestureDetector(
+                          onTap: () {
+                            // Navigate to more info
+                          },
+                          child: Text(
+                            'Learn more',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                         ),
                       ],
@@ -315,30 +343,27 @@ class _DashboardState extends State<Dashboard> {
                       width: 30.w,
                       label: "Sync",
                       onPressed: () {
-                        setState(() {
-                          calculateElixirScore();
-                          fetchHealthData();
-                        });
+                        fetchHealthData();
                       },
                     ),
                   ],
                 ),
                 SizedBox(height: 2.h),
-                buildMetricSection('Diet 🥣️', diet, (diet / 3000 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Diet 🥣️", "BMI", bmi),
                 SizedBox(height: 2.h),
-                buildMetricSection('Energy 🔥️', energyBurn, (energyBurn / 400 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Energy 🔥️", "Energy Burn", energyBurn),
                 SizedBox(height: 2.h),
-                buildMetricSection('Heart ❤️', heartRate, (heartRate / 80 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Heart❤️", "Heart Rate", heartRate),
                 SizedBox(height: 2.h),
-                buildMetricSection('Respiration 🫁️', respiration, (respiration / 25 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Respiration 🫁️", "Respiration", respiration),
                 SizedBox(height: 2.h),
-                buildMetricSection('Screen Time 📱️', screenTime, (screenTime / 120 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Screen Time 📱️", "Screen Time", screenTime),
                 SizedBox(height: 2.h),
-                buildMetricSection('Sleep 🛏️️', sleep, (sleep / 540 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Sleep 🛏️️", "Sleep", sleep),
                 SizedBox(height: 2.h),
-                buildMetricSection('Steps 🚶🏻️', steps, (steps / 10000 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Steps 🚶🏻️", "Steps", steps),
                 SizedBox(height: 2.h),
-                buildMetricSection('Sunlight ☀️️', sunlight, (sunlight / 90 * 100).toInt(), AppColors.grey),
+                buildMetricSection("Sunlight ☀️️", "Sunlight", sunlight),
                 SizedBox(height: 2.h),
               ],
             ),
@@ -348,12 +373,69 @@ class _DashboardState extends State<Dashboard> {
     });
   }
 
-  Widget buildMetricSection(String title, double value, int percentage, Color defaultColor) {
-    Color barColor = getColorForScore(percentage.toDouble());
+  Widget buildMetricSection(String title, String metricName, double value) {
+    // Define all metrics with their respective scoring ranges
+    List<HealthMetric> metrics = [
+      HealthMetric("BMI", bmi, 50, [
+        [10, 18.5, 0, 60],
+        [18.5, 24.9, 60, 100],
+        [24.9, 30, 100, 60],
+        [30, 50, 60, 0],
+      ]),
+      HealthMetric("Energy Burn", energyBurn, 15, [
+        [1000, 2000, 0, 60],
+        [2000, 3500, 60, 100],
+        [3500, 5000, 100, 60],
+        [5000, 8000, 60, 0],
+      ]),
+      HealthMetric("Heart Rate", heartRate, 10, [
+        [0, 40, 0, 100],
+        [40, 80, 100, 100],
+        [80, 100, 100, 60],
+        [100, 140, 60, 0],
+      ]),
+      HealthMetric("Respiration", respiration, 5, [
+        [8, 12, 0, 60],
+        [12, 20, 60, 100],
+        [20, 25, 100, 60],
+        [25, 30, 60, 0],
+      ]),
+      HealthMetric("Screen Time", screenTime, 15, [
+        [0, 1, 0, 80],
+        [1, 2, 80, 100],
+        [2, 4, 100, 20],
+        [4, 16, 20, 0],
+      ]),
+      HealthMetric("Sleep", sleep, 20, [
+        [4, 6, 0, 60],
+        [6, 8, 60, 100],
+        [8, 10, 100, 60],
+        [10, 12, 60, 0],
+      ]),
+      HealthMetric("Steps", steps, 10, [
+        [0, 5000, 0, 60],
+        [5000, 10000, 60, 100],
+        [10000, 15000, 100, 100],
+        [15000, 30000, 100, 100],
+      ]),
+      HealthMetric("Sunlight", sunlight, 10, [
+        [0, 1, 0, 100],
+        [1, 4, 100, 100],
+        [4, 6, 100, 100],
+        [6, 8, 100, 100],
+      ]),
+    ];
+
+    // Find the metric by name
+    HealthMetric? metric =
+        metrics.firstWhere((m) => m.name == metricName, orElse: () => HealthMetric(metricName, value, 0, []));
+
+    double percentage = metric.getPercentage();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // Title and Percentage
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -364,7 +446,7 @@ class _DashboardState extends State<Dashboard> {
             Row(
               children: [
                 Text(
-                  '$percentage%',
+                  '${percentage.toInt()}%',
                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
                 ),
                 const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
@@ -373,15 +455,18 @@ class _DashboardState extends State<Dashboard> {
           ],
         ),
         SizedBox(height: 1.5.h),
+        // Progress Bar
         SizedBox(
           width: 75.w,
           child: Row(
             children: List.generate(3, (index) {
+              // Each block represents roughly 33.3% of the bar
+              bool active = percentage > (index * 33.3);
               return Expanded(
                 child: Container(
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(25),
-                    color: index < percentage / 33.3 ? barColor : defaultColor,
+                    color: active ? getColorForScore(percentage) : AppColors.grey,
                   ),
                   height: 5.sp,
                   margin: EdgeInsets.symmetric(horizontal: 1.sp),

@@ -134,7 +134,7 @@ class _SignupState extends State<Signup> {
 
                         if (authProvider.user != null) {
                           await _setLoginStatus(true);
-                          Get.offAndToNamed(AppRoutes.dashboard);
+                         // Get.offAndToNamed(AppRoutes.dashboard);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Registration failed. Please try again.')),
