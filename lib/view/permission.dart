@@ -4,6 +4,8 @@ import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:health/health.dart';
+//import 'package:screen_time_api_ios/screen_time_api_ios.dart';
 import 'package:sizer/sizer.dart';
 
 class PermissionScreen extends StatefulWidget {
@@ -19,6 +21,30 @@ class _PermissionScreenState extends State<PermissionScreen> {
     'Notification': false,
     'Screen Time': false,
   };
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize permission status
+    _checkInitialPermissions();
+  }
+
+  void _checkInitialPermissions() async {
+    final healthStatus = await _checkHealthPermission();
+    final notificationStatus = await Permission.notification.status;
+    
+    setState(() {
+      permissions['Apple Health'] = healthStatus;
+      permissions['Notification'] = notificationStatus.isGranted;
+      // Handle Screen Time permission status here if available
+    });
+  }
+
+  Future<bool> _checkHealthPermission() async {
+    HealthFactory health = HealthFactory();
+    bool accessGranted = await health.requestAuthorization([HealthDataType.HEART_RATE]);
+    return accessGranted;
+  }
 
   void showCustomPanel(BuildContext context, String permissionKey, String heading, String detail) {
     showModalBottomSheet(
@@ -92,28 +118,28 @@ class _PermissionScreenState extends State<PermissionScreen> {
     PermissionStatus status;
     switch (permissionKey) {
       case 'Apple Health':
-        // Replace with actual health permission request if available
-        status = await Permission.activityRecognition.request();
+        bool accessGranted = await _checkHealthPermission();
+        setState(() {
+          permissions['Apple Health'] = accessGranted;
+        });
         break;
       case 'Notification':
         status = await Permission.notification.request();
+        setState(() {
+          permissions['Notification'] = status.isGranted;
+        });
         break;
       case 'Screen Time':
-        // Replace with actual screen time permission request if available
-        status = await Permission.accessMediaLocation.request();
+        // This plugin method doesn't request permissions directly
+      //  final _screenTimeApiIosPlugin = ScreenTimeApiIos();
+        // Assuming there's no direct permission request; handle accordingly
+       // _screenTimeApiIosPlugin.selectAppsToDiscourage();
+        setState(() {
+          permissions['Screen Time'] = true; // Assume successful operation
+        });
         break;
       default:
         return;
-    }
-
-    if (status.isGranted) {
-      setState(() {
-        permissions[permissionKey] = true;
-      });
-    } else {
-      setState(() {
-        permissions[permissionKey] = false;
-      });
     }
   }
 
@@ -129,14 +155,18 @@ class _PermissionScreenState extends State<PermissionScreen> {
               SizedBox(
                 height: 6.h,
               ),
-              Text(
-                'Health Sync',
-                style: Theme.of(context).textTheme.displaySmall,
+              Center(
+                child: Text(
+                  'Health Sync',
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
               ),
               SizedBox(height: 1.h),
-              Text(
-                "Please give the app all permissions",
-                style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
+              Center(
+                child: Text(
+                  "Please give the app all permissions",
+                  style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
+                ),
               ),
               SizedBox(
                 height: 6.h,
@@ -149,7 +179,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
                       context,
                       'Apple Health',
                       '❤️',
-                      'The Health app gathers health data from your iPhone...',
+                      'The Health app gathers health data from your iPhone',
                     ),
                     SizedBox(
                       height: 2.h,

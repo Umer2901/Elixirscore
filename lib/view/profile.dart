@@ -35,7 +35,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          '       Profile',
+          'Profile',
           style: Theme.of(context).textTheme.displaySmall,
         ),
         leading: Padding(
@@ -219,12 +219,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 SizedBox(
                   height: 2.h,
                 ),
-                // CustomButton(
-                //   label: "Donate",
-                //   onPressed: () {},
-                //   backgroundColor: Colors.amber,
-                //   borderColor: Colors.amber,
-                // )
+                CustomButton(
+                  label: "Donate",
+                  onPressed: () {
+                    Get.toNamed(AppRoutes.permission);
+                  },
+                  backgroundColor: Colors.amber,
+                  borderColor: Colors.amber,
+                )
               ],
             ),
           ),
