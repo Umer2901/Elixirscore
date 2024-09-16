@@ -126,8 +126,10 @@ Future<void> _setLoginStatus(bool status) async {
 
  Future<void> verifyPhoneNumber(BuildContext context, String phoneNumber) async {
   try {
+     await _auth.setSettings(appVerificationDisabledForTesting: true);
     _phoneNumber = phoneNumber; 
     await _auth.verifyPhoneNumber(
+      
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         User? currentUser = _auth.currentUser;

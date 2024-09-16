@@ -74,7 +74,7 @@ class _DashboardState extends State<Dashboard> {
     HealthDataType.BODY_MASS_INDEX,
     HealthDataType.ACTIVE_ENERGY_BURNED,
     HealthDataType.HEART_RATE,
-    HealthDataType.RESTING_HEART_RATE,
+    HealthDataType.RESPIRATORY_RATE,
     HealthDataType.STEPS,
     HealthDataType.SLEEP_IN_BED,
   ];
@@ -110,7 +110,7 @@ class _DashboardState extends State<Dashboard> {
     case HealthDataType.HEART_RATE:
       heartRate = _convertToDouble(data.value);
       break;
-    case HealthDataType.RESTING_HEART_RATE:
+    case HealthDataType.RESPIRATORY_RATE:
       respiration = _convertToDouble(data.value);
       break;
     case HealthDataType.STEPS:
