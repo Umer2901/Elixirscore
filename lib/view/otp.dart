@@ -106,7 +106,7 @@ class _OtpScreenState extends State<OtpScreen> {
     label: "Verify",
     onPressed: () async {
       if (otp.length < 6) {
-        _showSnackbar('Please enter the full OTP');
+        _showSnackbar('Please enter the full code');
         return;
       }
 

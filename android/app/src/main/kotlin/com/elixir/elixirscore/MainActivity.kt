@@ -1,4 +1,4 @@
-package com.example.elixirscore
+package com.elixir.elixirscore
 
 import io.flutter.embedding.android.FlutterActivity
 

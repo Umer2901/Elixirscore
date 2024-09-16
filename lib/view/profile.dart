@@ -203,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('Contact us',
+                          Text('Feedback',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
@@ -220,7 +220,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   height: 2.h,
                 ),
                 CustomButton(
-                  label: "Donate",
+                  label: "Permissions",
                   onPressed: () {
                     Get.toNamed(AppRoutes.permission);
                   },

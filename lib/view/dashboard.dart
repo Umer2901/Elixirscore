@@ -99,29 +99,31 @@ class _DashboardState extends State<Dashboard> {
 
         setState(() {
           for (var data in healthData) {
-            switch (data.type) {
-              case HealthDataType.BODY_MASS_INDEX:
-                bmi = _convertToDouble(data.value);
-                break;
-              case HealthDataType.ACTIVE_ENERGY_BURNED:
-                energyBurn = _convertToDouble(data.value);
-                break;
-              case HealthDataType.HEART_RATE:
-                heartRate = _convertToDouble(data.value);
-                break;
-              case HealthDataType.RESTING_HEART_RATE:
-                respiration = _convertToDouble(data.value);
-                break;
-              case HealthDataType.STEPS:
-                steps = _convertToDouble(data.value);
-                break;
-              case HealthDataType.SLEEP_IN_BED:
-                sleep = _convertToDouble(data.value);
-                break;
-              default:
-                break;
-            }
-          }
+  print('Data type: ${data.type}, value: ${data.value}');  // Debugging
+  switch (data.type) {
+    case HealthDataType.BODY_MASS_INDEX:
+      bmi = _convertToDouble(data.value);
+      break;
+    case HealthDataType.ACTIVE_ENERGY_BURNED:
+      energyBurn = _convertToDouble(data.value);
+      break;
+    case HealthDataType.HEART_RATE:
+      heartRate = _convertToDouble(data.value);
+      break;
+    case HealthDataType.RESTING_HEART_RATE:
+      respiration = _convertToDouble(data.value);
+      break;
+    case HealthDataType.STEPS:
+      steps = _convertToDouble(data.value);
+      break;
+    case HealthDataType.SLEEP_IN_BED:
+      sleep = _convertToDouble(data.value);
+      break;
+    default:
+      break;
+  }
+}
+
           sunlight = 8.0; // Placeholder value for sunlight
         });
       } catch (e) {

@@ -97,7 +97,7 @@ class _ExperienceFormState extends State<ExperienceForm> {
           ),
         ),
         title:  Center(
-          child: Text('Contact us    ',
+          child: Text('Feedback       ',
                       style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                           fontWeight: FontWeight.bold, fontSize: 18.sp)),
         ),
@@ -113,14 +113,14 @@ class _ExperienceFormState extends State<ExperienceForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text('Share you experience or issue',
+                Text('Please share any feedback below ❤️',
                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
                             fontWeight: FontWeight.bold, fontSize: 12.sp)),
               ],
             ),
             TextField(
               controller: _messageController,
-              decoration: const InputDecoration(labelText: 'Your Experience'),
+              decoration: const InputDecoration(labelText: 'Questions? Comments? Concerns?'),
               maxLines: 5,
             ),
              SizedBox(height: 5.h),
