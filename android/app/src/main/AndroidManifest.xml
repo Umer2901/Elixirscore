@@ -1,5 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.elixir.elixirscore">
+
+    package="com.example.flutter_application_elixirscore">
+    xmlns:tools="http://schemas.android.com/tools"
 
     <!-- Permissions -->
     <uses-permission android:name="android.permission.ACTIVITY_RECOGNITION" />
@@ -17,6 +19,17 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.health.READ_HEART_RATE"/>
+<uses-permission android:name="android.permission.health.WRITE_HEART_RATE"/>
+<uses-permission android:name="android.permission.ACTIVITY_RECOGNITION"/>
+<uses-permission android:name="android.permission.BODY_SENSORS"/>
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+   <!-- <uses-permission
+      //  android:name="android.permission.PACKAGE_USAGE_STATS"
+      //  tools:ignore="ProtectedPermissions" /> -->
+
+    
+    
 
     <application
         android:label="flutter_application_elixirscore"
@@ -36,6 +49,9 @@
               android:name="io.flutter.embedding.android.NormalTheme"
               android:resource="@style/NormalTheme"
               />
+               <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version" />
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
