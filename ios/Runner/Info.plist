@@ -4,6 +4,14 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSUsageDescription</key>
+<string>This app requires access to Screen Time data.</string>
+
+<key>NSAppleMusicUsageDescription</key>
+<string>We need access to monitor device activity.</string>
+<key>NSUserTrackingUsageDescription</key>
+<string>This app needs access to screen time to track usage data for apps.</string>
+
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

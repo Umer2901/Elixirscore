@@ -3,6 +3,8 @@ import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
+import 'package:flutter_application_elixirscore/view/monitor.dart';
+import 'package:flutter_application_elixirscore/view/screen_time.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -163,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 GestureDetector(
                     onTap: () {
-                    Get.toNamed(AppRoutes.privacy);
+              
                   },
                   child: Container(
                     decoration: BoxDecoration(
@@ -192,7 +194,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    Get.toNamed(AppRoutes.contact);
+                 //   Get.toNamed(AppRoutes.contact);
+                Navigator.push(  
+    context,  
+    MaterialPageRoute(builder: (context) => MyApp1()),  
+  );  
                   },
                   child: Container(
                     decoration: BoxDecoration(
