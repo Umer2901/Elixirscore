@@ -1,4 +1,5 @@
 import 'dart:io'; // For platform checks
+import 'dart:math'; // Import for using max() function
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
@@ -161,6 +162,7 @@ class _DashboardState extends State<Dashboard> {
                     SizedBox(height: 2.h),
                     buildMetricsSection(context, provider),
                     SizedBox(height: 2.h),
+                   
                   ],
                 ),
               ),
@@ -174,21 +176,15 @@ class _DashboardState extends State<Dashboard> {
   Widget buildMetricsSection(BuildContext context, HealthDataProvider provider) {
     return Column(
       children: [
-        buildMetricSection(context, "BMI 🥣️", "BMI", provider.bmi, calculateMetricScore(provider.bmi, 5, bmiRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Energy 🔥️", "Energy Burn", provider.energyBurn, calculateMetricScore(provider.energyBurn, 15, energyRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Heart❤️", "Heart Rate", provider.heartRate, calculateMetricScore(provider.heartRate, 10, heartRateRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, calculateMetricScore(provider.respiration, 5, respirationRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, calculateMetricScore(provider.screenTime, 15, screenTimeRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, calculateMetricScore(provider.sleep, 20, sleepRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, calculateMetricScore(provider.steps, 10, stepsRanges)),
-        SizedBox(height: 2.h),
-        buildMetricSection(context, "Sunlight ☀️️", "Sunlight", provider.sunlight, calculateMetricScore(provider.sunlight, 10, sunlightRanges)),
+        buildMetricSection(context, "BMI 🥣️", "BMI", provider.bmi, provider.bmiScore),
+        buildMetricSection(context, "Diet 🥗", "Diet", provider.diet, provider.dietScore),
+        buildMetricSection(context, "Energy 🔥️", "Energy Burn", provider.energyBurn, provider.energyScore),
+        buildMetricSection(context, "Heart ❤️", "Heart Rate", provider.heartRate, provider.heartScore),
+        buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, provider.respirationScore),
+        buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
+        buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
+        buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
+        //buildMetricSection(context, "Daylight ☀️️", "Daylight", provider.sunlight, provider.daylightScore),
       ],
     );
   }
@@ -238,54 +234,30 @@ class _DashboardState extends State<Dashboard> {
     );
   }
 
-  double calculateElixirScore(HealthDataProvider provider) {
-    double bmiScore = calculateMetricScore(provider.bmi, 5, bmiRanges);
-    double energyBurnScore = calculateMetricScore(provider.energyBurn, 15, energyRanges);
-    double heartRateScore = calculateMetricScore(provider.heartRate, 10, heartRateRanges);
-    double respirationScore = calculateMetricScore(provider.respiration, 5, respirationRanges);
-    double screenTimeScore = calculateMetricScore(provider.screenTime, 15, screenTimeRanges);
-    double sleepScore = calculateMetricScore(provider.sleep, 20, sleepRanges);
-    double stepsScore = calculateMetricScore(provider.steps, 10, stepsRanges);
-    double sunlightScore = calculateMetricScore(provider.sunlight, 10, sunlightRanges);
+double calculateElixirScore(HealthDataProvider provider) {
+  // Apply weightages to each metric's score
+  double bmiWeightedScore = provider.bmiScore * 0.05; // 5% weightage
+  double dietWeightedScore = provider.dietScore * 0.10; // 10% weightage
+  double energyBurnWeightedScore = provider.energyScore * 0.15; // 15% weightage
+  double heartWeightedScore = provider.heartScore * 0.15; // 15% weightage
+  double respirationWeightedScore = provider.respirationScore * 0.10; // 10% weightage
+  double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage
+  double sleepWeightedScore = provider.sleepScore * 0.20; // 20% weightage
+  double stepsWeightedScore = provider.stepsScore * 0.15; // 15% weightage
 
-    double totalScore = bmiScore +
-        energyBurnScore +
-        heartRateScore +
-        respirationScore +
-        screenTimeScore +
-        sleepScore +
-        stepsScore +
-        sunlightScore;
+  // Calculate total weighted score by summing up all weighted scores
+  double totalWeightedScore = bmiWeightedScore +
+      dietWeightedScore +
+      energyBurnWeightedScore +
+      heartWeightedScore +
+      respirationWeightedScore +
+      screenTimeWeightedScore +
+      sleepWeightedScore +
+      stepsWeightedScore;
 
-    return totalScore.clamp(0, 100); // Ensure the score is between 0 and 100
-  }
-
-  double calculateMetricScore(double value, double weight, List<List<double>> ranges) {
-    for (var range in ranges) {
-      if (value >= range[0] && value <= range[1]) {
-        return _calculateScoreForRange(value, range) * weight / 100;
-      }
-    }
-    if (value < ranges.first[0]) {
-      return ranges.first[2] * weight / 100;
-    }
-    return ranges.last[3] * weight / 100;
-  }
-
-  double _calculateScoreForRange(double value, List<double> range) {
-    double minValue = range[0];
-    double maxValue = range[1];
-    double minScore = range[2];
-    double maxScore = range[3];
-
-    if (value <= minValue) return minScore;
-    if (value >= maxValue) return maxScore;
-
-    double rangeSize = maxValue - minValue;
-    double scoreRangeSize = maxScore - minScore;
-    double normalizedValue = (value - minValue) / rangeSize;
-    return minScore + normalizedValue * scoreRangeSize;
-  }
+  // Cap the total score at 100 if it exceeds that value
+  return totalWeightedScore.clamp(0, 100);
+}
 
   Color getColorForScore(double percentage) {
     if (percentage <= 33.3)
@@ -295,61 +267,4 @@ class _DashboardState extends State<Dashboard> {
     else
       return AppColors.primary;
   }
-
-  // Define ranges for each metric
-  final List<List<double>> bmiRanges = [
-    [10, 18.5, 0, 60],
-    [18.5, 24.9, 60, 100],
-    [24.9, 30, 100, 60],
-    [30, 50, 60, 0],
-  ];
-
-  final List<List<double>> energyRanges = [
-    [1000, 2000, 0, 60],
-    [2000, 3500, 60, 100],
-    [3500, 5000, 100, 60],
-    [5000, 8000, 60, 0],
-  ];
-
-  final List<List<double>> heartRateRanges = [
-    [0, 40, 0, 100],
-    [40, 80, 100, 100],
-    [80, 100, 100, 60],
-    [100, 140, 60, 0],
-  ];
-
-  final List<List<double>> respirationRanges = [
-    [8, 12, 0, 60],
-    [12, 20, 60, 100],
-    [20, 25, 100, 60],
-    [25, 30, 60, 0],
-  ];
-
-  final List<List<double>> screenTimeRanges = [
-    [0, 1, 0, 80],
-    [1, 2, 80, 100],
-    [2, 4, 100, 20],
-    [4, 16, 20, 0],
-  ];
-
-  final List<List<double>> sleepRanges = [
-    [4, 6, 0, 60],
-    [6, 8, 60, 100],
-    [8, 10, 100, 60],
-    [10, 12, 60, 0],
-  ];
-
-  final List<List<double>> stepsRanges = [
-    [0, 5000, 0, 60],
-    [5000, 10000, 60, 100],
-    [10000, 15000, 100, 100],
-    [15000, 30000, 100, 100],
-  ];
-
-  final List<List<double>> sunlightRanges = [
-    [0, 1, 0, 100],
-    [1, 4, 100, 100],
-    [4, 6, 100, 100],
-    [6, 8, 100, 100],
-  ];
 }
