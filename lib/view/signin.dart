@@ -59,12 +59,14 @@ class _SigninState extends State<Signin> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _emailController,
+                    keyboardType: TextInputType.text,
                     name: "email",
                     hintText: "Email Address",
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   SizedBox(height: 1.h),
                   CustomTextField(
+                      keyboardType: TextInputType.text,
                     controller: _passwordController,
                     name: "Password",
                     hintText: "Password",
@@ -210,3 +212,4 @@ class _SigninState extends State<Signin> {
     );
   }
 }
+

@@ -51,6 +51,7 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _emailController,
+                      keyboardType: TextInputType.text,
                     name: "email",
                     hintText: "Email Address",
                     prefixIcon: const Icon(Icons.email_outlined),
@@ -63,6 +64,7 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _passwordController,
+                      keyboardType: TextInputType.text,
                     name: "Password",
                     hintText: "Password",
                     obscureText: _obsecurePassword,
@@ -88,6 +90,7 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _confirmPasswordController,
+                      keyboardType: TextInputType.text,
                     name: "Confirm Password",
                     hintText: "Confirm Password",
                     obscureText: _obsecureConfirmPassword,

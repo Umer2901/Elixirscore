@@ -52,8 +52,10 @@ class _DashboardState extends State<Dashboard> {
         return Sizer(builder: (context, orientation, deviceType) {
           return Scaffold(
             appBar: AppBar(
-              scrolledUnderElevation: 0.0,
-              surfaceTintColor: Colors.white,
+             scrolledUnderElevation: 0.0,
+             forceMaterialTransparency: true,
+surfaceTintColor: Colors.transparent,
+
               leading: IconButton(
                 onPressed: () {
                   Get.toNamed(AppRoutes.profile);
@@ -181,6 +183,8 @@ class _DashboardState extends State<Dashboard> {
         buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, provider.respirationScore),
         buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
         buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
+        buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
+         buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
         buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
         //buildMetricSection(context, "Daylight ☀️️", "Daylight", provider.sunlight, provider.daylightScore),
       ],

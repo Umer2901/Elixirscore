@@ -47,69 +47,68 @@ class _PermissionScreenState extends State<PermissionScreen> {
     return accessGranted;
   }
 
-  void showCustomPanel(BuildContext context, String permissionKey, String heading, String detail) {
-    showModalBottomSheet(
+  Future<void> _showCustomBottomSheet(
+      BuildContext context, String permissionKey, String heading, String detail) {
+    return showModalBottomSheet(
       context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       isScrollControlled: true,
       builder: (context) {
-        return DraggableScrollableSheet(
-          expand: false,
-          builder: (_, controller) {
-            return Container(
-              decoration: const BoxDecoration(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-                color: AppColors.grey,
-              ),
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                controller: controller,
+        return Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        heading,
-                        style: Theme.of(context).textTheme.headlineLarge?.copyWith(
-                          fontSize: 18.sp
-                        )
-                      ),
-                      IconButton(onPressed: (){ Navigator.of(context).pop();}, icon: const CircleAvatar(backgroundColor:AppColors.white,child: Icon(Icons.close)))
-                    ],
+                  Text(
+                    heading,
+                    style: Theme.of(context).textTheme.headlineLarge?.copyWith(fontSize: 18.sp),
+                  ),
+                  IconButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    icon: const CircleAvatar(
+                      backgroundColor: AppColors.white,
+                      child: Icon(Icons.close),
+                    ),
+                  )
+                ],
+              ),
+              SizedBox(height: 1.h),
+              Text(
+                detail,
+                style: Theme.of(context).textTheme.bodyMedium,
+              ),
+              SizedBox(height: 2.h),
+              Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  CustomButton(
+                    label: "Enable",
+                    onPressed: () async {
+                      await _requestPermission(permissionKey);
+                      Navigator.of(context).pop();
+                    },
                   ),
                   SizedBox(height: 1.h),
-                  Text(
-                    detail,
-                    style: Theme.of(context).textTheme.bodyMedium,
-                  ),
-                  SizedBox(height: 2.h),
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: [
-                      CustomButton(
-                        label: "Enable",
-                        onPressed: () async {
-                          await _requestPermission(permissionKey);
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      SizedBox(
-                        height: 1.h,
-                      ),
-                      CustomButton(
-                        label: "Cancel",
-                        borderColor: AppColors.white,
-                        backgroundColor: AppColors.white,
-                        foregroundColor: AppColors.black,
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                    ],
+                  CustomButton(
+                    label: "Cancel",
+                    borderColor: AppColors.white,
+                    backgroundColor: AppColors.white,
+                    foregroundColor: AppColors.black,
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
                   ),
                 ],
               ),
-            );
-          },
+            ],
+          ),
         );
       },
     );
@@ -138,7 +137,6 @@ class _PermissionScreenState extends State<PermissionScreen> {
     }
   }
 
-  // Start screen time monitoring and request permission if needed
   Future<void> _startScreenTimeMonitoring() async {
     try {
       await platform.invokeMethod('startMonitoring');
@@ -152,15 +150,11 @@ class _PermissionScreenState extends State<PermissionScreen> {
     }
   }
 
-  // Get the screen time usage data and update state
   Future<void> _getUsageData() async {
     try {
       final String usage = await platform.invokeMethod('getUsageData');
       print("Retrieved screen time: $usage");
-
-      // Assuming the usage data is in minutes, convert to a double value
       double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
-
       setState(() {
         permissions['Screen Time'] = true; // Permission granted and data retrieved
       });
@@ -178,9 +172,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              SizedBox(
-                height: 6.h,
-              ),
+              SizedBox(height: 6.h),
               Center(
                 child: Text(
                   'Health Sync',
@@ -194,9 +186,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
                   style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
                 ),
               ),
-              SizedBox(
-                height: 6.h,
-              ),
+              SizedBox(height: 6.h),
               Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -205,25 +195,21 @@ class _PermissionScreenState extends State<PermissionScreen> {
                       context,
                       'Apple Health',
                       '❤️',
-                      'The Health app gathers health data from your iPhone',
+                      'The Health app gathers health data from your iPhone, iPad, Apple Watch, and apps that you already use, so you can view all your progress in one convenient place. Health automatically counts your steps, walking, and running distances. And, if you have an Apple Watch, it automatically tracks your Activity data.',
                     ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
+                    SizedBox(height: 2.h),
                     _buildPermissionCard(
                       context,
                       'Notification',
                       '🔔',
-                      'To help you keep track of your health data...',
+                      'To help you keep track of your health data over time, Health can alert you to significant changes in types of data like resting heart rate, number of steps, and amount of sleep. Trend lines show you how much these metrics have changed and for how long.',
                     ),
-                    SizedBox(
-                      height: 2.h,
-                    ),
+                    SizedBox(height: 2.h),
                     _buildPermissionCard(
                       context,
                       'Screen Time',
                       '📱️',
-                      'Screen time is the amount of time spent using a device...',
+                      'Screen time is the amount of time spent using a device with a screen such as a smartphone, computer, television, video game console, or even a tablet. The concept is under significant research with related concepts in digital media use and mental health',
                     ),
                   ],
                 ),
@@ -237,7 +223,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
               Get.toNamed(AppRoutes.dashboard);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Please enable all permissions before proceeding.')),
+                const SnackBar(content: Text('Please enable all permissions before proceeding.')),
               );
             }
           },
@@ -254,44 +240,38 @@ class _PermissionScreenState extends State<PermissionScreen> {
   }
 
   Widget _buildPermissionCard(
-    BuildContext context, String permissionKey, String emoji, String detail) {
-  return Container(
-    width: double.infinity,
-    decoration: BoxDecoration(
-      borderRadius: BorderRadius.circular(20),
-      color: permissions[permissionKey] == true ? AppColors.primary : AppColors.grey,
-    ),
-    child: Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        children: [
-          SizedBox(
-            height: 1.h,
-          ),
-          Text(
-            '$permissionKey                 $emoji',
-            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.normal,
-                  fontSize: 18.sp,
-                ),
-          ),
-          SizedBox(
-            height: 2.h,
-          ),
-          CustomButton(
-            height: 6.h,
-            label: permissions[permissionKey] == true ? "Enabled" : "Enable",
-            onPressed: permissions[permissionKey] == true
-                ? () {}  // Provide an empty function if the permission is already enabled
-                : () {
-                    showCustomPanel(
-                        context, permissionKey, permissionKey, detail);
-                  },
-          )
-        ],
+      BuildContext context, String permissionKey, String emoji, String detail) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20),
+        color: permissions[permissionKey] == true ? AppColors.primary : AppColors.grey,
       ),
-    ),
-  );
+      child: Padding(
+        padding: const EdgeInsets.all(12.0),
+        child: Column(
+          children: [
+            SizedBox(height: 1.h),
+            Text(
+              '$permissionKey                 $emoji',
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 18.sp,
+                  ),
+            ),
+            SizedBox(height: 2.h),
+            CustomButton(
+              height: 6.h,
+              label: permissions[permissionKey] == true ? "Enabled" : "Enable",
+              onPressed: permissions[permissionKey] == true
+                  ? () {} // Provide an empty function if the permission is already enabled
+                  : () {
+                      _showCustomBottomSheet(context, permissionKey, permissionKey, detail);
+                    },
+            )
+          ],
+        ),
+      ),
+    );
+  }
 }
-}
-
