@@ -194,11 +194,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                 //   Get.toNamed(AppRoutes.contact);
-                Navigator.push(  
-    context,  
-    MaterialPageRoute(builder: (context) => MyApp1()),  
-  );  
+                  Get.toNamed(AppRoutes.contact);
+    
                   },
                   child: Container(
                     decoration: BoxDecoration(

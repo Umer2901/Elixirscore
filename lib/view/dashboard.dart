@@ -45,9 +45,7 @@ class _DashboardState extends State<Dashboard> {
   Widget build(BuildContext context) {
     return Consumer<HealthDataProvider>(
       builder: (context, provider, child) {
-        if (!provider.dataFetched) {
-          return Center(child: CircularProgressIndicator()); // Show loading indicator while data is being fetched
-        }
+     
 
         double elixirScore = calculateElixirScore(provider);
 

@@ -169,15 +169,18 @@ class HealthDataProvider extends ChangeNotifier {
             : 100);
   }
 
-  double calculateScreenTimeScore(double screenTime) {
-    double lowerBound = 1;
-    double upperBound = 2;
-    return min(100, (screenTime > upperBound)
-        ? max(0, 100 - 100 * ((screenTime - upperBound) / (upperBound - lowerBound)))
-        : (screenTime < lowerBound)
-            ? 100 + 100 * ((lowerBound - screenTime) / (upperBound - lowerBound))
-            : 100);
-  }
+double calculateScreenTimeScore(double screenTime) {
+  double lowerBound = 1;
+  double upperBound = 2;
+  return min(
+      100,
+      (screenTime > upperBound)
+          ? max(0, 100 - 100 * ((screenTime - upperBound) / (upperBound - lowerBound)))
+          : (screenTime < lowerBound)
+              ? 100 + 100 * ((lowerBound - screenTime) / (upperBound - lowerBound))
+              : 100);
+}
+
 
   double calculateSleepScore(double sleep) {
     double lowerBound = 6; // Minimum recommended hours of sleep

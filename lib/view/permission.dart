@@ -5,8 +5,8 @@ import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart'
 import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:health/health.dart';
-//import 'package:screen_time_api_ios/screen_time_api_ios.dart';
 import 'package:sizer/sizer.dart';
+import 'package:flutter/services.dart';
 
 class PermissionScreen extends StatefulWidget {
   const PermissionScreen({super.key});
@@ -16,6 +16,8 @@ class PermissionScreen extends StatefulWidget {
 }
 
 class _PermissionScreenState extends State<PermissionScreen> {
+  static const platform = MethodChannel('com.elixir.elixirscore/deviceActivity');
+
   final Map<String, bool> permissions = {
     'Apple Health': false,
     'Notification': false,
@@ -25,18 +27,17 @@ class _PermissionScreenState extends State<PermissionScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize permission status
     _checkInitialPermissions();
   }
 
   void _checkInitialPermissions() async {
     final healthStatus = await _checkHealthPermission();
     final notificationStatus = await Permission.notification.status;
-    
+    // Assume false for Screen Time initially
     setState(() {
       permissions['Apple Health'] = healthStatus;
       permissions['Notification'] = notificationStatus.isGranted;
-      // Handle Screen Time permission status here if available
+      permissions['Screen Time'] = false; // Placeholder until permission is granted
     });
   }
 
@@ -130,16 +131,41 @@ class _PermissionScreenState extends State<PermissionScreen> {
         });
         break;
       case 'Screen Time':
-        // This plugin method doesn't request permissions directly
-      //  final _screenTimeApiIosPlugin = ScreenTimeApiIos();
-        // Assuming there's no direct permission request; handle accordingly
-       // _screenTimeApiIosPlugin.selectAppsToDiscourage();
-        setState(() {
-          permissions['Screen Time'] = true; // Assume successful operation
-        });
+        await _startScreenTimeMonitoring();
         break;
       default:
         return;
+    }
+  }
+
+  // Start screen time monitoring and request permission if needed
+  Future<void> _startScreenTimeMonitoring() async {
+    try {
+      await platform.invokeMethod('startMonitoring');
+      print("Screen time monitoring started.");
+      setState(() {
+        permissions['Screen Time'] = true;
+      });
+      _getUsageData(); // Fetch initial screen time usage data
+    } on PlatformException catch (e) {
+      print("Failed to start monitoring: '${e.message}'.");
+    }
+  }
+
+  // Get the screen time usage data and update state
+  Future<void> _getUsageData() async {
+    try {
+      final String usage = await platform.invokeMethod('getUsageData');
+      print("Retrieved screen time: $usage");
+
+      // Assuming the usage data is in minutes, convert to a double value
+      double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
+
+      setState(() {
+        permissions['Screen Time'] = true; // Permission granted and data retrieved
+      });
+    } on PlatformException catch (e) {
+      print("Failed to get usage data: '${e.message}'.");
     }
   }
 
@@ -268,3 +294,4 @@ class _PermissionScreenState extends State<PermissionScreen> {
   );
 }
 }
+
