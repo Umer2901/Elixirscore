@@ -1,5 +1,4 @@
-import 'dart:io'; // For platform checks
-import 'dart:math'; // Import for using max() function
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
@@ -11,6 +10,7 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:semicircle_indicator/semicircle_indicator.dart';
 import 'package:health/health.dart';
+import 'package:flutter/services.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -20,6 +20,7 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  static const platform = MethodChannel('com.elixir.elixirscore/deviceActivity'); // MethodChannel for native communication
   String _errorMessage = '';
 
   @override
@@ -27,6 +28,7 @@ class _DashboardState extends State<Dashboard> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
+      _startMonitoring();
     });
   }
 
@@ -41,12 +43,42 @@ class _DashboardState extends State<Dashboard> {
     }
   }
 
+  // Start screen time monitoring and request permission if needed
+  Future<void> _startMonitoring() async {
+    try {
+      await platform.invokeMethod('startMonitoring');
+      print("Screen time monitoring started.");
+      _getUsageData(); // Fetch initial screen time usage data
+    } on PlatformException catch (e) {
+      print("Failed to start monitoring: '${e.message}'.");
+    }
+  }
+
+  // Get the screen time usage data and update the HealthDataProvider
+  Future<void> _getUsageData() async {
+    try {
+      final String usage = await platform.invokeMethod('getUsageData');
+      print("Retrieved screen time: $usage");
+
+      // Assuming the usage data is in minutes, convert to a double value
+      double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
+
+      // Update the HealthDataProvider with the screen time value
+      Provider.of<HealthDataProvider>(context, listen: false).screenTime = screenTime;
+      Provider.of<HealthDataProvider>(context, listen: false).screenTimeScore =
+          Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
+
+      // Notify listeners to update UI or data dependencies
+      Provider.of<HealthDataProvider>(context, listen: false).notifyListeners();
+    } on PlatformException catch (e) {
+      print("Failed to get usage data: '${e.message}'.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer<HealthDataProvider>(
       builder: (context, provider, child) {
-     
-
         double elixirScore = calculateElixirScore(provider);
 
         return Sizer(builder: (context, orientation, deviceType) {
@@ -55,7 +87,8 @@ class _DashboardState extends State<Dashboard> {
              scrolledUnderElevation: 0.0,
              forceMaterialTransparency: true,
 surfaceTintColor: Colors.transparent,
-
+              
+    
               leading: IconButton(
                 onPressed: () {
                   Get.toNamed(AppRoutes.profile);
@@ -155,6 +188,7 @@ surfaceTintColor: Colors.transparent,
                           label: "Sync",
                           onPressed: () {
                             provider.fetchHealthData(); // Fetch the latest health data
+                            _startMonitoring(); // Start monitoring screen time data
                           },
                         ),
                       ],
@@ -162,7 +196,6 @@ surfaceTintColor: Colors.transparent,
                     SizedBox(height: 2.h),
                     buildMetricsSection(context, provider),
                     SizedBox(height: 2.h),
-                   
                   ],
                 ),
               ),
@@ -173,23 +206,44 @@ surfaceTintColor: Colors.transparent,
     );
   }
 
-  Widget buildMetricsSection(BuildContext context, HealthDataProvider provider) {
+   Widget buildMetricsSection(BuildContext context, HealthDataProvider provider) {
     return Column(
       children: [
         buildMetricSection(context, "BMI 🥣️", "BMI", provider.bmi, provider.bmiScore),
-        buildMetricSection(context, "Diet 🥗", "Diet", provider.diet, provider.dietScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Nutrition 🥗", "Diet", provider.diet, provider.dietScore),
+         SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Energy 🔥️", "Energy Burn", provider.energyBurn, provider.energyScore),
+        SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Heart ❤️", "Heart Rate", provider.heartRate, provider.heartScore),
+        SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, provider.respirationScore),
+         SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
+        SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
+        SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
-         buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
-        buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
-        //buildMetricSection(context, "Daylight ☀️️", "Daylight", provider.sunlight, provider.daylightScore),
+     //   buildMetricSection(context, "Daylight ☀️️", "Daylight", provider.sunlight, provider.daylightScore),
       ],
     );
   }
+
+  
 
   Widget buildMetricSection(BuildContext context, String title, String metricName, double value, double percentage) {
     return Column(
@@ -236,30 +290,30 @@ surfaceTintColor: Colors.transparent,
     );
   }
 
-double calculateElixirScore(HealthDataProvider provider) {
-  // Apply weightages to each metric's score
-  double bmiWeightedScore = provider.bmiScore * 0.05; // 5% weightage
-  double dietWeightedScore = provider.dietScore * 0.10; // 10% weightage
-  double energyBurnWeightedScore = provider.energyScore * 0.15; // 15% weightage
-  double heartWeightedScore = provider.heartScore * 0.15; // 15% weightage
-  double respirationWeightedScore = provider.respirationScore * 0.10; // 10% weightage
-  double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage
-  double sleepWeightedScore = provider.sleepScore * 0.20; // 20% weightage
-  double stepsWeightedScore = provider.stepsScore * 0.15; // 15% weightage
+  double calculateElixirScore(HealthDataProvider provider) {
+    // Apply weightages to each metric's score
+    double bmiWeightedScore = provider.bmiScore * 0.05; // 5% weightage
+    double dietWeightedScore = provider.dietScore * 0.10; // 10% weightage
+    double energyBurnWeightedScore = provider.energyScore * 0.15; // 15% weightage
+    double heartWeightedScore = provider.heartScore * 0.15; // 15% weightage
+    double respirationWeightedScore = provider.respirationScore * 0.10; // 10% weightage
+    double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage
+    double sleepWeightedScore = provider.sleepScore * 0.20; // 20% weightage
+    double stepsWeightedScore = provider.stepsScore * 0.15; // 15% weightage
 
-  // Calculate total weighted score by summing up all weighted scores
-  double totalWeightedScore = bmiWeightedScore +
-      dietWeightedScore +
-      energyBurnWeightedScore +
-      heartWeightedScore +
-      respirationWeightedScore +
-      screenTimeWeightedScore +
-      sleepWeightedScore +
-      stepsWeightedScore;
+    // Calculate total weighted score by summing up all weighted scores
+    double totalWeightedScore = bmiWeightedScore +
+        dietWeightedScore +
+        energyBurnWeightedScore +
+        heartWeightedScore +
+        respirationWeightedScore +
+        screenTimeWeightedScore +
+        sleepWeightedScore +
+        stepsWeightedScore;
 
-  // Cap the total score at 100 if it exceeds that value
-  return totalWeightedScore.clamp(0, 100);
-}
+    // Cap the total score at 100 if it exceeds that value
+    return totalWeightedScore.clamp(0, 100);
+  }
 
   Color getColorForScore(double percentage) {
     if (percentage <= 33.3)
