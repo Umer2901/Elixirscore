@@ -4,6 +4,7 @@ import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
 import 'package:flutter_application_elixirscore/providers/health_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
+import 'package:flutter_application_elixirscore/view/chat.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
@@ -99,7 +100,10 @@ surfaceTintColor: Colors.transparent,
                 IconButton(
                   icon: const Icon(Icons.comment),
                   tooltip: 'Comment Icon',
-                  onPressed: () {},
+                  onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatScreen()));
+          
+                  },
                 ),
               ],
             ),

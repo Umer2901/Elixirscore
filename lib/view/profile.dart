@@ -165,7 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
                 GestureDetector(
                     onTap: () {
-              
+                    Get.toNamed(AppRoutes.privacy);
                   },
                   child: Container(
                     decoration: BoxDecoration(
