@@ -40,16 +40,15 @@ class HealthDataProvider extends ChangeNotifier {
     HealthDataType.BODY_TEMPERATURE, // Proxy for sunlight exposure
   ];
 
-  // Fetch health data from the device
+  // Fetch health data from the device using the latest data available
   Future<void> fetchHealthData() async {
     final health = HealthFactory();
     bool accessWasGranted;
 
+    // Request permissions for the specified health data types
     if (Platform.isIOS) {
-      // Request authorization for iOS
       accessWasGranted = await health.requestAuthorization(types);
     } else if (Platform.isAndroid) {
-      // Request authorization for Android with read permissions
       List<HealthDataAccess> permissions = List.filled(types.length, HealthDataAccess.READ);
       accessWasGranted = await health.requestAuthorization(types, permissions: permissions);
     } else {
@@ -58,48 +57,58 @@ class HealthDataProvider extends ChangeNotifier {
 
     if (accessWasGranted) {
       try {
+        // Fetch the latest health data without specifying date range
         List<HealthDataPoint> healthData = await health.getHealthDataFromTypes(
-          DateTime.now().subtract(const Duration(days: 1)),
-          DateTime.now(),
+          DateTime.now().subtract(const Duration(days: 365)), // Start date as far back as possible
+          DateTime.now(), // End date as today
           types,
         );
 
-        // Process each health data point and update the state accordingly
+        // Map to store the latest data points for each health data type
+        Map<HealthDataType, HealthDataPoint> latestDataPoints = {};
+
+        // Iterate through the health data and keep only the most recent data point for each type
         for (var data in healthData) {
-          switch (data.type) {
+          // If the data type already has a value, compare timestamps and keep the latest one
+          if (!latestDataPoints.containsKey(data.type) ||
+              data.dateFrom.isAfter(latestDataPoints[data.type]!.dateFrom)) {
+            latestDataPoints[data.type] = data;
+          }
+        }
+
+        // Update health metrics with the most recent data points
+        for (var entry in latestDataPoints.entries) {
+          switch (entry.key) {
             case HealthDataType.BODY_MASS_INDEX:
-              bmi = _convertToDouble(data.value);
+              bmi = _convertToDouble(entry.value.value);
               bmiScore = calculateBMIScore(bmi);
               break;
             case HealthDataType.ACTIVE_ENERGY_BURNED:
-              energyBurn = _convertToDouble(data.value);
+              energyBurn = _convertToDouble(entry.value.value);
               energyScore = calculateEnergyScore(energyBurn);
-              print("Energy Burn: $energyBurn, Energy Score: $energyScore");
               break;
             case HealthDataType.STEPS:
-              steps = _convertToDouble(data.value);
+              steps = _convertToDouble(entry.value.value);
               stepsScore = calculateStepsScore(steps);
-              print("Steps: $steps, Steps Score: $stepsScore");
               break;
             case HealthDataType.DIETARY_CARBS_CONSUMED:
-              diet = _convertToDouble(data.value);
+              diet = _convertToDouble(entry.value.value);
               dietScore = calculateDietScore(diet);
               break;
             case HealthDataType.RESTING_HEART_RATE:
-              heartRate = _convertToDouble(data.value);
+              heartRate = _convertToDouble(entry.value.value);
               heartScore = calculateHeartScore(heartRate);
               break;
             case HealthDataType.RESPIRATORY_RATE:
-              respiration = _convertToDouble(data.value);
+              respiration = _convertToDouble(entry.value.value);
               respirationScore = calculateRespirationScore(respiration);
               break;
             case HealthDataType.SLEEP_IN_BED:
-              sleep = _convertToDouble(data.value) / 60; // Convert minutes to hours
+              sleep = _convertToDouble(entry.value.value) / 60; // Convert minutes to hours
               sleepScore = calculateSleepScore(sleep);
-              print("Sleep: $sleep hours, Sleep Score: $sleepScore");
               break;
             case HealthDataType.BODY_TEMPERATURE:
-              sunlight = _convertToDouble(data.value); // Using temperature as a proxy for sunlight
+              sunlight = _convertToDouble(entry.value.value); // Using temperature as a proxy for sunlight
               daylightScore = calculateDaylightScore(sunlight);
               break;
             default:
@@ -117,6 +126,7 @@ class HealthDataProvider extends ChangeNotifier {
       print("Authorization not granted");
     }
   }
+
 
   // Calculation methods for each health metric
   double calculateBMIScore(double bmi) {

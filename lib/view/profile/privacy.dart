@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class Privacy extends StatelessWidget {
+  const Privacy({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +34,7 @@ class Privacy extends StatelessWidget {
                           ),
                         ),
                  
-        title: Text(
+        title: const Text(
           'ElixirScore Privacy Policy',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -43,15 +45,15 @@ class Privacy extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Last Updated: 08/16/2024',
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Elixir ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use the ElixirScore App ("App"). Please read this Privacy Policy carefully. By using the ElixirScore App, you agree to the collection and use of your information as described in this policy. If you do not agree with the terms of this Privacy Policy, please do not use the App.',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ...buildSection('1. Information We Collect', [
                 'Personal Information:',
                 'When you register for the ElixirScore App, we may collect personal information such as your name, email address, date of birth, and any other information you provide during registration.',
@@ -117,11 +119,11 @@ class Privacy extends StatelessWidget {
     return [
       Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      SizedBox(height: 8),
-      ...texts.map((text) => Text(text)).toList(),
-      SizedBox(height: 16),
+      const SizedBox(height: 8),
+      ...texts.map((text) => Text(text)),
+      const SizedBox(height: 16),
     ];
   }
 }

@@ -8,6 +8,8 @@ import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 
 class ExperienceForm extends StatefulWidget {
+  const ExperienceForm({super.key});
+
   @override
   _ExperienceFormState createState() => _ExperienceFormState();
 }

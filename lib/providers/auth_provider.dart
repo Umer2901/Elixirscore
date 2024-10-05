@@ -64,54 +64,81 @@ Future<void> _setLoginStatus(bool status) async {
   }
 
   Future<void> signInWithGoogle(BuildContext context) async {
-    try {
-      final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
-      if (googleUser == null) {
-        Get.to(const Signin());
-        return;
+  try {
+    final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
+    if (googleUser == null) {
+      Get.to(const Signin());  // If the user cancels the Google sign-in, navigate to the Signin page
+      return;
+    }
+
+    final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+
+    UserCredential userCredential = await _auth.signInWithCredential(credential);
+    _user = userCredential.user;
+
+    if (_user != null) {
+      final phoneNumber = _user!.phoneNumber;
+
+      if (phoneNumber == null) {
+        // If phone number is not available, navigate to phoneAuth screen to add phone number
+        Get.toNamed(AppRoutes.phoneAuth);
+      } else {
+        // Verify the registered phone number
+        await verifyPhoneNumber(context, phoneNumber);
       }
-
-      final GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-      final AuthCredential credential = GoogleAuthProvider.credential(
-        accessToken: googleAuth.accessToken,
-        idToken: googleAuth.idToken,
-      );
-
-      UserCredential userCredential = await _auth.signInWithCredential(credential);
-      _user = userCredential.user;
-      await _setLoginStatus(true);
-      notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
-    } catch (e) {
-      _showErrorSnackbar(context, 'An unknown error occurred');
     }
+
+    await _setLoginStatus(true);
+    notifyListeners();
+  } on FirebaseAuthException catch (e) {
+    _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
+  } catch (e) {
+    _showErrorSnackbar(context, 'An unknown error occurred');
   }
+}
 
-  Future<void> signInWithApple(BuildContext context) async {
-    try {
-      final appleCredential = await SignInWithApple.getAppleIDCredential(
-        scopes: [
-          AppleIDAuthorizationScopes.email,
-          AppleIDAuthorizationScopes.fullName,
-        ],
-      );
+Future<void> signInWithApple(BuildContext context) async {
+  try {
+    final appleCredential = await SignInWithApple.getAppleIDCredential(
+      scopes: [
+        AppleIDAuthorizationScopes.email,
+        AppleIDAuthorizationScopes.fullName,
+      ],
+    );
 
-      final oauthCredential = OAuthProvider("apple.com").credential(
-        idToken: appleCredential.identityToken,
-        accessToken: appleCredential.authorizationCode,
-      );
+    final oauthCredential = OAuthProvider("apple.com").credential(
+      idToken: appleCredential.identityToken,
+      accessToken: appleCredential.authorizationCode,
+    );
 
-      UserCredential userCredential = await _auth.signInWithCredential(oauthCredential);
-      _user = userCredential.user;
-      await _setLoginStatus(true);
-      notifyListeners();
-    } on FirebaseAuthException catch (e) {
-      _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
-    } catch (e) {
-      _showErrorSnackbar(context, 'An unknown error occurred');
+    UserCredential userCredential = await _auth.signInWithCredential(oauthCredential);
+    _user = userCredential.user;
+
+    if (_user != null) {
+      final phoneNumber = _user!.phoneNumber;
+
+      if (phoneNumber == null) {
+        // If phone number is not available, navigate to phoneAuth screen to add phone number
+        Get.toNamed(AppRoutes.phoneAuth);
+      } else {
+        // Verify the registered phone number
+        await verifyPhoneNumber(context, phoneNumber);
+      }
     }
+
+    await _setLoginStatus(true);
+    notifyListeners();
+  } on FirebaseAuthException catch (e) {
+    _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
+  } catch (e) {
+    _showErrorSnackbar(context, 'An unknown error occurred');
   }
+}
+
 
   Future<void> sendPasswordResetEmail(BuildContext context, String email) async {
     try {
@@ -124,12 +151,12 @@ Future<void> _setLoginStatus(bool status) async {
     }
   }
 
- Future<void> verifyPhoneNumber(BuildContext context, String phoneNumber) async {
+Future<void> verifyPhoneNumber(BuildContext context, String phoneNumber) async {
   try {
-     await _auth.setSettings(appVerificationDisabledForTesting: true);
-    _phoneNumber = phoneNumber; 
+    await _auth.setSettings(appVerificationDisabledForTesting: true);
+    _phoneNumber = phoneNumber;
+
     await _auth.verifyPhoneNumber(
-      
       phoneNumber: phoneNumber,
       verificationCompleted: (PhoneAuthCredential credential) async {
         User? currentUser = _auth.currentUser;
@@ -147,7 +174,8 @@ Future<void> _setLoginStatus(bool status) async {
         Get.toNamed(AppRoutes.basicinfo);
       },
       verificationFailed: (FirebaseAuthException e) {
-        _showErrorSnackbar(context, e.message ?? 'Phone number verification failed');
+        print("Verification failed with code: ${e.code}, message: ${e.message}");
+        _showErrorSnackbar(context, 'Verification failed: ${e.code} - ${e.message}');
       },
       codeSent: (String verificationId, int? resendToken) {
         _verificationId = verificationId;
@@ -158,7 +186,8 @@ Future<void> _setLoginStatus(bool status) async {
       },
     );
   } catch (e) {
-    _showErrorSnackbar(context, 'Phone number verification failed');
+    print("Error occurred: $e");
+    _showErrorSnackbar(context, 'An internal error occurred');
   }
 }
 

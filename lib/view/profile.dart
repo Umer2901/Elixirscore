@@ -1,10 +1,7 @@
-import 'package:flutter/widgets.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
-import 'package:flutter_application_elixirscore/view/monitor.dart';
-import 'package:flutter_application_elixirscore/view/screen_time.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';

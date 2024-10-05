@@ -60,15 +60,15 @@ class _AccountInfoState extends State<AccountInfo> {
         body: Padding(
           padding: const EdgeInsets.all(12.0),
           child: basicInfoProvider.basicInfo == null
-              ? Center(child: CircularProgressIndicator())
+              ? const Center(child: CircularProgressIndicator())
               : Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     SizedBox(height: 4.h),
                     _buildInfoRow('Gender', basicInfoProvider.basicInfo!.selectedGender),
                     _buildInfoRow('Age', basicInfoProvider.basicInfo!.age.toStringAsFixed(2)),
-                    _buildInfoRow('Height', basicInfoProvider.basicInfo!.height.toStringAsFixed(2) + ' ft'),
-                    _buildInfoRow('Weight', basicInfoProvider.basicInfo!.weight.toStringAsFixed(2) + ' lbs'),
+                    _buildInfoRow('Height', '${basicInfoProvider.basicInfo!.height.toStringAsFixed(2)} ft'),
+                    _buildInfoRow('Weight', '${basicInfoProvider.basicInfo!.weight.toStringAsFixed(2)} lbs'),
                     _buildInfoRow('Email', basicInfoProvider.basicInfo!.email),
                     _buildInfoRow('Phone Number', basicInfoProvider.basicInfo!.phoneNumber.isEmpty ? 'N/A' : basicInfoProvider.basicInfo!.phoneNumber),
                   ],

@@ -154,9 +154,7 @@ class _SigninState extends State<Signin> {
                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
                           await authProvider.signInWithApple(context);
 
-                          if (authProvider.user != null) {
-                            Get.offAndToNamed(AppRoutes.phoneAuth);
-                          }
+                      
                     },
                     child: SizedBox(
                       height: 8.h,
@@ -169,9 +167,7 @@ class _SigninState extends State<Signin> {
                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
                           await authProvider.signInWithGoogle(context);
 
-                          if (authProvider.user != null) {
-                            Get.offAndToNamed(AppRoutes.phoneAuth);
-                          }
+                          
                     },
                     child: SizedBox(
                       height: 8.h,

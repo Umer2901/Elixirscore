@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class UsageMonitor extends StatefulWidget {
+  const UsageMonitor({super.key});
+
   @override
   _UsageMonitorState createState() => _UsageMonitorState();
 }
@@ -40,7 +42,7 @@ class _UsageMonitorState extends State<UsageMonitor> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text('App Usage Monitor'),
+          title: const Text('App Usage Monitor'),
         ),
         body: Center(
           child: Column(
@@ -48,17 +50,17 @@ class _UsageMonitorState extends State<UsageMonitor> {
             children: [
               Text(
                 'Total Usage: $_usageTime',
-                style: TextStyle(fontSize: 24),
+                style: const TextStyle(fontSize: 24),
               ),
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _startMonitoring,
-                child: Text('Start Monitoring'),
+                child: const Text('Start Monitoring'),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               ElevatedButton(
                 onPressed: _getUsageData,
-                child: Text('Get Usage Data'),
+                child: const Text('Get Usage Data'),
               ),
             ],
           ),

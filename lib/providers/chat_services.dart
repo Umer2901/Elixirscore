@@ -1,15 +1,19 @@
 import 'dart:convert';
-import 'package:flutter_application_elixirscore/constants/key.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_application_elixirscore/constants/key.dart'; // Make sure this file contains your API key
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
+// ChatGPT Service Class
 class ChatGPTService {
   final String apiKey;
   final String apiUrl = "https://api.openai.com/v1/chat/completions";
 
+  // Constructor to initialize the API key
   ChatGPTService(this.apiKey);
 
-  Future<String> getChatResponse(String message) async {
+  // Method to get ChatGPT response with two required arguments
+  Future<String> getChatResponse(String message, List<Map<String, String>> chatHistory) async {
     int maxRetries = 5;
     int retryCount = 0;
     int retryDelay = 2; // Initial delay in seconds
@@ -20,15 +24,25 @@ class ChatGPTService {
           Uri.parse(apiUrl),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $OPENAI_API_KEY',
+            'Authorization': 'Bearer $OPENAI_API_KEY', // Ensure this is the correct API key
           },
           body: jsonEncode({
-            // Change the model name here
-            "model": "gpt-4", // Use "gpt-4" or "gpt-3.5-turbo" instead
+            "model": "gpt-4", // Use "gpt-3.5-turbo" if you don't have access to gpt-4
             "messages": [
+              {
+                "role": "system",
+                "content": "You are Elixir, a personalized health assistant focused on longevity, happiness, and accountability. "
+                    "You should refer to yourself as Elixir in all responses. Always address yourself as 'Elixir' instead of OpenAI. "
+                    "Respond using individual sentences instead of paragraphs unless necessary. Avoid using long paragraphs. Use emojis where relevant and always ask for emoji reactions. "
+                    "If the response has multiple points, separate them into many messages. Be sure to give clear, actionable advice. "
+                    "If the user is upset, encourage them to give feedback in their profile."
+              },
+              ...chatHistory.map((entry) => {"role": entry['role'], "content": entry['content']}),
               {"role": "user", "content": message}
             ],
-            "max_tokens": 100,
+            "max_tokens": 200, // Increased max_tokens for longer responses
+            "temperature": 0.7, // Adjust for more creative responses
+            "top_p": 0.9, // Ensure more deterministic responses
           }),
         );
 
@@ -36,15 +50,19 @@ class ChatGPTService {
           final jsonResponse = json.decode(response.body);
           return jsonResponse['choices'][0]['message']['content'].trim();
         } else if (response.statusCode == 429) {
-          // Extract 'Retry-After' header if available
           int retryAfter = int.tryParse(response.headers['retry-after'] ?? '1') ?? retryDelay;
           print('Rate limit exceeded. Retrying after $retryAfter seconds...');
           await Future.delayed(Duration(seconds: retryAfter));
           retryCount++;
         } else if (response.statusCode == 404) {
-          // Handle 404 Not Found Error
           print("Error: 404 - Endpoint or model not found. Check your API URL and model name.");
-          return "Error: 404 - Endpoint or model not found. Please check the API URL and model name.";
+          return "Error: 404 - Endpoint or model not found. Please check your API URL and model name.";
+        } else if (response.statusCode == 401) {
+          print("Error: 401 - Unauthorized. Please check your API key.");
+          return "Error: 401 - Unauthorized. Please check your API key.";
+        } else if (response.statusCode == 403) {
+          print("Error: 403 - Forbidden. Please ensure you have access to this model.");
+          return "Error: 403 - Forbidden. Please ensure you have access to this model.";
         } else {
           print("Error: ${response.statusCode} - ${response.reasonPhrase}");
           return "Error: ${response.statusCode} - ${response.reasonPhrase}";

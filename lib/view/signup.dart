@@ -170,7 +170,7 @@ class _SignupState extends State<Signup> {
                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
                             children: <InlineSpan>[
                               TextSpan(
-                                text: 'Signin',
+                                text: 'Sign in',
                                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary),
                               ),
                             ],

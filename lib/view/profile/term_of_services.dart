@@ -4,6 +4,8 @@ import 'package:get/get.dart';
 import 'package:sizer/sizer.dart';
 
 class TermsAndServices extends StatelessWidget {
+  const TermsAndServices({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,7 +34,7 @@ class TermsAndServices extends StatelessWidget {
                           ),
                         ),
                  
-        title: Text(
+        title: const Text(
           'ElixirScore Terms of Service',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
@@ -43,15 +45,15 @@ class TermsAndServices extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 'Last Updated: 08/16/2024',
                 style: TextStyle(fontStyle: FontStyle.italic),
               ),
-              SizedBox(height: 16),
-              Text(
+              const SizedBox(height: 16),
+              const Text(
                 'Welcome to the ElixirScore App, a health and wellness platform designed to provide personalized health insights and recommendations. By accessing or using the ElixirScore App, you agree to comply with and be bound by the following Terms of Service ("Terms"). Please read these Terms carefully before using the App.',
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               ...buildSection('1. Acceptance of Terms', [
                 'By accessing, downloading, or using the ElixirScore App, you agree to these Terms and any applicable laws and regulations. If you do not agree with these Terms, you are prohibited from using the App.'
               ]),
@@ -114,11 +116,11 @@ class TermsAndServices extends StatelessWidget {
     return [
       Text(
         title,
-        style: TextStyle(fontWeight: FontWeight.bold),
+        style: const TextStyle(fontWeight: FontWeight.bold),
       ),
-      SizedBox(height: 8),
-      ...texts.map((text) => Text(text)).toList(),
-      SizedBox(height: 16),
+      const SizedBox(height: 8),
+      ...texts.map((text) => Text(text)),
+      const SizedBox(height: 16),
     ];
   }
 }

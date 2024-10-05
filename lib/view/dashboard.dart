@@ -320,9 +320,9 @@ surfaceTintColor: Colors.transparent,
   }
 
   Color getColorForScore(double percentage) {
-    if (percentage <= 33.3)
+    if (percentage <= 33.3) {
       return AppColors.red;
-    else if (percentage <= 66.6)
+    } else if (percentage <= 66.6)
       return AppColors.green;
     else
       return AppColors.primary;

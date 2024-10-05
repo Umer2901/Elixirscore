@@ -7,6 +7,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:health/health.dart';
 import 'package:sizer/sizer.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class PermissionScreen extends StatefulWidget {
   const PermissionScreen({super.key});
@@ -27,24 +28,81 @@ class _PermissionScreenState extends State<PermissionScreen> {
   @override
   void initState() {
     super.initState();
+    _loadSavedPermissions();
+  }
+
+  Future<void> _loadSavedPermissions() async {
+    // Load permission states from SharedPreferences to maintain persistence
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      permissions['Apple Health'] = prefs.getBool('Apple Health') ?? false;
+      permissions['Notification'] = prefs.getBool('Notification') ?? false;
+      permissions['Screen Time'] = prefs.getBool('Screen Time') ?? false;
+    });
     _checkInitialPermissions();
   }
 
-  void _checkInitialPermissions() async {
+  Future<void> _checkInitialPermissions() async {
     final healthStatus = await _checkHealthPermission();
     final notificationStatus = await Permission.notification.status;
-    // Assume false for Screen Time initially
+
     setState(() {
       permissions['Apple Health'] = healthStatus;
       permissions['Notification'] = notificationStatus.isGranted;
-      permissions['Screen Time'] = false; // Placeholder until permission is granted
     });
+
+    // Update permissions in SharedPreferences
+    _savePermissionStatus('Apple Health', healthStatus);
+    _savePermissionStatus('Notification', notificationStatus.isGranted);
+
+    // Check screen time permission through platform channel
+    await _getScreenTimePermissionStatus();
   }
 
-  Future<bool> _checkHealthPermission() async {
-    HealthFactory health = HealthFactory();
-    bool accessGranted = await health.requestAuthorization([HealthDataType.HEART_RATE]);
-    return accessGranted;
+  Future<void> _savePermissionStatus(String permissionKey, bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(permissionKey, status);
+  }
+
+Future<bool> _checkHealthPermission() async {
+  // Define the list of HealthDataTypes you want to request permissions for
+  List<HealthDataType> healthDataTypes = [
+    HealthDataType.BODY_MASS_INDEX,
+    HealthDataType.ACTIVE_ENERGY_BURNED,
+    HealthDataType.STEPS,
+    HealthDataType.DIETARY_CARBS_CONSUMED, // Diet score
+    HealthDataType.RESTING_HEART_RATE,
+    HealthDataType.RESPIRATORY_RATE,
+    HealthDataType.SLEEP_IN_BED, // Sleep duration
+    HealthDataType.BODY_TEMPERATURE,
+  ];
+
+  // Create a list of permissions corresponding to each HealthDataType
+  List<HealthDataAccess> permissions = List.filled(healthDataTypes.length, HealthDataAccess.READ);
+
+  // Create a HealthFactory instance
+  HealthFactory health = HealthFactory();
+
+  // Request authorization for the specified data types
+  bool accessGranted = await health.requestAuthorization(
+    healthDataTypes,
+    permissions: permissions,
+  );
+
+  // Return the result of the permission request
+  return accessGranted;
+}
+
+  Future<void> _getScreenTimePermissionStatus() async {
+    try {
+      final bool isGranted = await platform.invokeMethod('isScreenTimeGranted');
+      setState(() {
+        permissions['Screen Time'] = isGranted;
+      });
+      _savePermissionStatus('Screen Time', isGranted);
+    } on PlatformException catch (e) {
+      print("Failed to get screen time permission status: '${e.message}'.");
+    }
   }
 
   Future<void> _showCustomBottomSheet(
@@ -57,7 +115,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
       isScrollControlled: true,
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(16.0),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -122,12 +180,14 @@ class _PermissionScreenState extends State<PermissionScreen> {
         setState(() {
           permissions['Apple Health'] = accessGranted;
         });
+        _savePermissionStatus('Apple Health', accessGranted);
         break;
       case 'Notification':
         status = await Permission.notification.request();
         setState(() {
           permissions['Notification'] = status.isGranted;
         });
+        _savePermissionStatus('Notification', status.isGranted);
         break;
       case 'Screen Time':
         await _startScreenTimeMonitoring();
@@ -144,6 +204,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
       setState(() {
         permissions['Screen Time'] = true;
       });
+      _savePermissionStatus('Screen Time', true);
       _getUsageData(); // Fetch initial screen time usage data
     } on PlatformException catch (e) {
       print("Failed to start monitoring: '${e.message}'.");
@@ -158,6 +219,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
       setState(() {
         permissions['Screen Time'] = true; // Permission granted and data retrieved
       });
+      _savePermissionStatus('Screen Time', true);
     } on PlatformException catch (e) {
       print("Failed to get usage data: '${e.message}'.");
     }
