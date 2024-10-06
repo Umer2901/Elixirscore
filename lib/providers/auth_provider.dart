@@ -153,7 +153,7 @@ Future<void> signInWithApple(BuildContext context) async {
 
 Future<void> verifyPhoneNumber(BuildContext context, String phoneNumber) async {
   try {
-    await _auth.setSettings(appVerificationDisabledForTesting: true);
+  //  await _auth.setSettings(appVerificationDisabledForTesting: true);
     _phoneNumber = phoneNumber;
 
     await _auth.verifyPhoneNumber(

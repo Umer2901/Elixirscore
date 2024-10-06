@@ -54,11 +54,12 @@ class _BasicInfoState extends State<BasicInfo> {
                   });
                 }),
                 SizedBox(height: 3.h),
-                _buildSlider('Height', 4, 7, height, (value) {
-                  setState(() {
-                    height = value;
-                  });
-                }),
+               _buildSlider('Height', 4, 8, height, (value) {
+  setState(() {
+    height = value;
+  });
+}, divisions: 40),
+
                 SizedBox(height: 3.h),
                 _buildSlider('Weight', 50, 300, weight, (value) {
                   setState(() {
@@ -135,49 +136,50 @@ class _BasicInfoState extends State<BasicInfo> {
     );
   }
 
-  Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: Theme.of(context).textTheme.headlineMedium,
+Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged, {int? divisions}) {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text(
+        label,
+        style: Theme.of(context).textTheme.headlineMedium,
+      ),
+      SliderTheme(
+        data: SliderTheme.of(context).copyWith(
+          activeTrackColor: AppColors.grey,
+          inactiveTrackColor: AppColors.grey,
+          thumbColor: AppColors.primary,
+          valueIndicatorColor: Colors.black,
         ),
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            activeTrackColor: AppColors.grey,
-            inactiveTrackColor: AppColors.grey,
-            thumbColor: AppColors.primary,
-            valueIndicatorColor: Colors.black,
-          ),
-          child: Slider(
-            value: value,
-            min: min,
-            max: max,
-            divisions: (max - min).toInt(),
-            label: value.toStringAsFixed(2),
-            onChanged: (double newValue) {
-              onChanged(newValue);
-            },
-          ),
+        child: Slider(
+          value: value,
+          min: min,
+          max: max,
+          divisions: divisions ?? (max - min).toInt(), // Default to (max - min) divisions if not provided
+          label: value.toStringAsFixed(1), // Show only 1 decimal point
+          onChanged: (double newValue) {
+            onChanged(newValue);
+          },
         ),
-        Padding(
-          padding: const EdgeInsets.only(left: 10, right: 10),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                min.toString(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-              Text(
-                max.toString(),
-                style: Theme.of(context).textTheme.bodyLarge,
-              ),
-            ],
-          ),
+      ),
+      Padding(
+        padding: const EdgeInsets.only(left: 10, right: 10),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              min.toString(),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            Text(
+              max.toString(),
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+          ],
         ),
-      ],
-    );
-  }
+      ),
+    ],
+  );
+}
+
 }

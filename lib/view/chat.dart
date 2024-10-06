@@ -1,53 +1,67 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/key.dart';
 import 'package:flutter_application_elixirscore/providers/chat_services.dart';
-import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dart';
-import 'package:get/get.dart';
-import 'package:flutter_application_elixirscore/constants/images.dart'; // Import AppImages class
+import 'package:flutter_application_elixirscore/constants/images.dart';
 
-// ChatScreen Widget
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({super.key});
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
-class _ChatScreenState extends State<ChatScreen> {
+class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
   final TextEditingController _controller = TextEditingController();
-  final ChatGPTService chatGPTService = ChatGPTService(OPENAI_API_KEY); // Use the constant API key
-  List<Map<String, String>> chatHistory = []; // List to store chat history
+  final ChatGPTService chatGPTService = ChatGPTService(OPENAI_API_KEY);
+  List<Map<String, String>> chatHistory = [];
+  late AnimationController _animationController;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
-    _loadChatHistory(); // Load chat history on screen initialization
+    _loadChatHistory();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: -50).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
   }
 
-  // Method to load chat history (if needed)
+  @override
+  void dispose() {
+    _animationController.dispose();
+    _controller.dispose();
+    super.dispose();
+  }
+
   void _loadChatHistory() async {
+    // Implement chat history loading logic here if needed
     setState(() {});
   }
 
-  // Clear chat history
-  void _clearChatHistory() async {
+  void _clearChatHistory() {
     setState(() {
       chatHistory.clear();
     });
   }
 
-  // Send message and get response
   void _sendMessage() async {
     String text = _controller.text.trim();
     if (text.isNotEmpty) {
+      _animationController.forward().then((_) {
+        _animationController.reset();
+      });
       setState(() {
         chatHistory.add({"role": "user", "content": text});
       });
+      _controller.clear();
       String response = await chatGPTService.getChatResponse(text, chatHistory);
       setState(() {
         chatHistory.add({"role": "assistant", "content": response});
       });
-      _controller.clear();
     }
   }
 
@@ -55,52 +69,52 @@ class _ChatScreenState extends State<ChatScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Image.asset(
-          AppImages.eye, // Use the asset path defined in AppImages
-          height: 40, // Set the height for the icon
+        backgroundColor: Colors.grey[100],
+        elevation: 0,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: Colors.blue),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
         ),
+        title: Image.asset(
+          'assets/images/eye.png',
+          height: 30,
+          color: Colors.red,
+        ),
+        centerTitle: true,
         actions: [
           IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: _clearChatHistory, // Button to clear chat history
+            icon: Icon(Icons.share, color: Colors.blue),
+            onPressed: _clearChatHistory,
           )
         ],
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Container(
+        color: Colors.grey[100],
         child: Column(
           children: [
-            // Display chat history
             Expanded(
               child: ListView.builder(
                 itemCount: chatHistory.length,
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
                 itemBuilder: (context, index) {
                   final entry = chatHistory[index];
-                  return ListTile(
-                    title: Align(
-                      alignment: entry['role'] == 'user'
-                          ? Alignment.centerRight
-                          : Alignment.centerLeft,
-                      child: Container(
-                        padding: const EdgeInsets.all(12),
-                        margin: const EdgeInsets.symmetric(vertical: 4),
-                        decoration: BoxDecoration(
-                          color: entry['role'] == 'user'
-                              ? Colors.blue[200]
-                              : Colors.grey[300],
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: RichText(
-                          text: TextSpan(
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontFamily: "AppleColorEmoji", // Enable emoji support
-                              color: Colors.black, // Text color
-                            ),
-                            children: [
-                              TextSpan(text: entry['content']),
-                            ],
-                          ),
+                  final isUser = entry['role'] == 'user';
+                  return Align(
+                    alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      margin: const EdgeInsets.only(bottom: 8),
+                      decoration: BoxDecoration(
+                        color: isUser ? Colors.blue[600] : Colors.white,
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        entry['content'] ?? '',
+                        style: TextStyle(
+                          color: isUser ? Colors.white : Colors.black,
+                          fontSize: 16,
                         ),
                       ),
                     ),
@@ -108,30 +122,82 @@ class _ChatScreenState extends State<ChatScreen> {
                 },
               ),
             ),
-            // TextField with Send Button
-            Row(
-              children: [
-                Expanded(
-                  child: TextField(
-                    controller: _controller,
-                    decoration: const InputDecoration(
-                      border: OutlineInputBorder(),
-                      hintText: "Message Elixir 😊",
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
+              color: Colors.grey[100],
+              child: Container(
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _controller,
+                        decoration: InputDecoration(
+                          hintText: "Message Elixir 😊",
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                        ),
+                        keyboardType: TextInputType.multiline,
+                        textInputAction: TextInputAction.newline,
+                        textCapitalization: TextCapitalization.sentences,
+                        maxLines: null,
+                        style: const TextStyle(fontSize: 16),
+                      ),
                     ),
-                    keyboardType: TextInputType.multiline, // Multiline input
-                    textInputAction: TextInputAction.newline, // Create new line on enter
-                    textCapitalization: TextCapitalization.sentences, // Capitalize first letter
-                    maxLines: null, // No limit on number of lines
-                    style: const TextStyle(fontSize: 18), // Font size to support emojis
-                  ),
+                    AnimatedBuilder(
+                      animation: _animation,
+                      builder: (context, child) {
+                        return Transform.translate(
+                          offset: Offset(0, _animation.value),
+                          child: child,
+                        );
+                      },
+                      child: CustomUpArrowButton(
+                        onPressed: _sendMessage,
+                        size: 40.0,
+                      ),
+                    ),
+                  ],
                 ),
-                IconButton(
-                  icon: const Icon(Icons.send),
-                  onPressed: _sendMessage, // Send message on button press
-                ),
-              ],
+              ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class CustomUpArrowButton extends StatelessWidget {
+  final VoidCallback onPressed;
+  final double size;
+
+  const CustomUpArrowButton({
+    Key? key,
+    required this.onPressed,
+    this.size = 40.0,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onPressed,
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.blue,
+        ),
+        child: Center(
+          child: Icon(
+            Icons.arrow_upward,
+            color: Colors.white,
+            size: size * 0.6,
+          ),
         ),
       ),
     );

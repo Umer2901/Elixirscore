@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
+import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
@@ -53,33 +54,32 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
                   height: 6.h,
                 ),
                 Padding(
-                          padding: const EdgeInsets.all(5.0),
-                          child: GestureDetector(
-                            onTap: () {
-                             Get.back();
-                            },
-                            child: Container(
-                              height: 5.h,
-                              width: 10.w,
-                              decoration: BoxDecoration(
-                                color: AppColors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                border: Border.all(color: AppColors.grey, width: 2),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.only(left: 5),
-                                child: Center(
-                child: Icon(Icons.arrow_back_ios),
-                                ),
-                              ),
-                            ),
-                          ),
+                  padding: const EdgeInsets.all(5.0),
+                  child: GestureDetector(
+                    onTap: () {
+                      Get.back();
+                    },
+                    child: Container(
+                      height: 5.h,
+                      width: 10.w,
+                      decoration: BoxDecoration(
+                        color: AppColors.white,
+                        borderRadius: BorderRadius.circular(10),
+                        border: Border.all(color: AppColors.grey, width: 2),
+                      ),
+                      child: const Padding(
+                        padding: EdgeInsets.only(left: 5),
+                        child: Center(
+                          child: Icon(Icons.arrow_back_ios),
                         ),
-                  
-                  Text(
-                    'Update your basic information',
-                    style: Theme.of(context).textTheme.displaySmall,
+                      ),
+                    ),
                   ),
+                ),
+                Text(
+                  'Update your basic information',
+                  style: Theme.of(context).textTheme.displaySmall,
+                ),
                 SizedBox(
                   height: 3.h,
                 ),
@@ -97,17 +97,18 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
                   });
                 }),
                 SizedBox(height: 3.h),
-                _buildSlider('Height', 4, 7, height, (value) {
+                // Updated height slider with more divisions for finer adjustments
+                _buildSlider('Height', 4, 8, height, (value) {
                   setState(() {
                     height = value;
                   });
-                }),
+                }, divisions: 40),
                 SizedBox(height: 3.h),
                 _buildSlider('Weight', 50, 300, weight, (value) {
                   setState(() {
                     weight = value;
                   });
-                }),
+                }, divisions: 50), // Added more divisions for weight too
               ],
             ),
           ),
@@ -116,7 +117,7 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
           onPressed: () async {
             final provider = Provider.of<BasicInfoProvider>(context, listen: false);
             await provider.updateBasicInfo(selectedGender, age, height, weight);
-           Get.back();
+            Get.back();
           },
           backgroundColor: AppColors.primary,
           shape: const CircleBorder(),
@@ -178,7 +179,8 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
     );
   }
 
-  Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged) {
+  // Modified _buildSlider to accept optional divisions parameter
+  Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged, {int? divisions}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -197,8 +199,8 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
             value: value,
             min: min,
             max: max,
-            divisions: (max - min).toInt(),
-            label: value.toStringAsFixed(2),
+            divisions: divisions ?? (max - min).toInt(), // Set divisions based on input or default to (max - min)
+            label: value.toStringAsFixed(1), // Display only 1 decimal place
             onChanged: (double newValue) {
               onChanged(newValue);
             },

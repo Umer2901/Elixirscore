@@ -1,10 +1,11 @@
+// ignore_for_file: depend_on_referenced_packages
+
 import 'dart:convert';
-import 'package:flutter/material.dart';
+import 'dart:io'; // Import to handle network exceptions
 import 'package:flutter_application_elixirscore/constants/key.dart'; // Make sure this file contains your API key
 import 'package:http/http.dart' as http;
 import 'dart:async';
 
-// ChatGPT Service Class
 class ChatGPTService {
   final String apiKey;
   final String apiUrl = "https://api.openai.com/v1/chat/completions";
@@ -47,7 +48,8 @@ class ChatGPTService {
         );
 
         if (response.statusCode == 200) {
-          final jsonResponse = json.decode(response.body);
+          final jsonResponse = json.decode(utf8.decode(response.bodyBytes)); // Use UTF-8 decoding
+          print("API Response: ${jsonResponse['choices'][0]['message']['content']}"); // Log response for debugging
           return jsonResponse['choices'][0]['message']['content'].trim();
         } else if (response.statusCode == 429) {
           int retryAfter = int.tryParse(response.headers['retry-after'] ?? '1') ?? retryDelay;
@@ -68,7 +70,11 @@ class ChatGPTService {
           return "Error: ${response.statusCode} - ${response.reasonPhrase}";
         }
       } catch (e) {
-        print("Exception: $e");
+        if (e is SocketException) {
+          print("Network error: $e");
+        } else {
+          print("Exception: $e");
+        }
         retryCount++;
         await Future.delayed(Duration(seconds: retryDelay * retryCount)); // Increase delay between retries
       }

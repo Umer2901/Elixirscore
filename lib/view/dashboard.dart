@@ -67,7 +67,7 @@ class _DashboardState extends State<Dashboard> {
       // Update the HealthDataProvider with the screen time value
       Provider.of<HealthDataProvider>(context, listen: false).screenTime = screenTime;
       Provider.of<HealthDataProvider>(context, listen: false).screenTimeScore =
-          Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
+      Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
 
       // Notify listeners to update UI or data dependencies
       Provider.of<HealthDataProvider>(context, listen: false).notifyListeners();
