@@ -28,10 +28,7 @@ class AuthProvider with ChangeNotifier {
       _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
     }
   }
-Future<void> _setLoginStatus(bool status) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', status);
-  }
+
   Future<void> loginWithEmailAndPassword(BuildContext context, String email, String password) async {
   try {
     UserCredential userCredential = await _auth.signInWithEmailAndPassword(email: email, password: password);
@@ -92,7 +89,7 @@ Future<void> _setLoginStatus(bool status) async {
       }
     }
 
-    await _setLoginStatus(true);
+   // await _setLoginStatus(true);
     notifyListeners();
   } on FirebaseAuthException catch (e) {
     _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
@@ -130,7 +127,7 @@ Future<void> signInWithApple(BuildContext context) async {
       }
     }
 
-    await _setLoginStatus(true);
+   // await _setLoginStatus(true);
     notifyListeners();
   } on FirebaseAuthException catch (e) {
     _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
@@ -153,7 +150,7 @@ Future<void> signInWithApple(BuildContext context) async {
 
 Future<void> verifyPhoneNumber(BuildContext context, String phoneNumber) async {
   try {
-  //  await _auth.setSettings(appVerificationDisabledForTesting: true);
+    //await _auth.setSettings(appVerificationDisabledForTesting: true);
     _phoneNumber = phoneNumber;
 
     await _auth.verifyPhoneNumber(

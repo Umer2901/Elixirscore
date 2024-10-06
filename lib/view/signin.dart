@@ -39,11 +39,7 @@ class _SigninState extends State<Signin> {
     }
   }
 
-  Future<void> _setLoginStatus(bool status) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', status);
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Sizer(
@@ -113,7 +109,7 @@ class _SigninState extends State<Signin> {
                           _emailController.text,
                           _passwordController.text,
                         );
-                        await _setLoginStatus(true);
+                      
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Login failed: $e')),

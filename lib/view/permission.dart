@@ -30,6 +30,10 @@ class _PermissionScreenState extends State<PermissionScreen> {
     super.initState();
     _loadSavedPermissions();
   }
+Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
 
   Future<void> _loadSavedPermissions() async {
     // Load permission states from SharedPreferences to maintain persistence
@@ -280,8 +284,9 @@ Future<bool> _checkHealthPermission() async {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             if (_allPermissionsGranted()) {
+                await _setLoginStatus(true);
               Get.toNamed(AppRoutes.dashboard);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

@@ -41,14 +41,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.1"
-  change_app_package_name:
-    dependency: "direct main"
-    description:
-      name: change_app_package_name
-      sha256: f734e127d334053873733fb61b1ecae73c09abb694b759a4afd26aa9c9547850
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.3.0"
   characters:
     dependency: transitive
     description:
@@ -222,14 +214,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  flutter_dotenv:
-    dependency: "direct main"
-    description:
-      name: flutter_dotenv
-      sha256: "9357883bdd153ab78cbf9ffa07656e336b8bbb2b5a3ca596b0b27e119f7c7d77"
-      url: "https://pub.dev"
-    source: hosted
-    version: "5.1.0"
   flutter_form_builder:
     dependency: "direct main"
     description:
@@ -600,14 +584,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "6.1.2"
-  screen_time_api_ios:
-    dependency: "direct main"
-    description:
-      name: screen_time_api_ios
-      sha256: d6cb584d7adac657ea207daa6faef00d82434a180bfb483e3ba6422a3cfeb1eb
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.0.4"
   semicircle_indicator:
     dependency: "direct main"
     description:
@@ -709,14 +685,6 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.99"
-  sliding_up_panel:
-    dependency: "direct main"
-    description:
-      name: sliding_up_panel
-      sha256: "578e90956a6212d1e406373250b2436a0f3afece29aee3c24c8360094d6cf968"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.0+1"
   source_span:
     dependency: transitive
     description:
