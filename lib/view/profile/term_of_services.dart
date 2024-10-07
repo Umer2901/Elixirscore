@@ -103,7 +103,7 @@ class TermsAndServices extends StatelessWidget {
                 'We may modify these Terms at any time by posting the updated Terms on the ElixirScore App. Your continued use of the App after any such changes constitutes your acceptance of the new Terms. We encourage you to review these Terms periodically for any updates.'
               ]),
               ...buildSection('15. Contact Information', [
-                'If you have any questions about these Terms, please contact us at info@elixirscore.com.'
+                'If you have any questions about these Terms, please contact us at elixirlabs@icloud.com'
               ]),
             ],
           ),

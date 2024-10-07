@@ -5,7 +5,7 @@ import Firebase
 import DeviceActivity
 import FamilyControls
 
-@UIApplicationMain
+@main
 @objc class AppDelegate: FlutterAppDelegate {
 
     var totalAppUsageTimeInMinutes = 0 // Store total usage time
