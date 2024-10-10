@@ -2,6 +2,9 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+<key>LSMinimumSystemVersion</key>
+<string>14.0</string>
+
     <key>CADisableMinimumFrameDurationOnPhone</key>
     <true/>
     <key>CFBundleDevelopmentRegion</key>
@@ -56,7 +59,7 @@
     <key>NSUserTrackingUsageDescription</key>
     <string>This identifier will be used to deliver personalized ads to you.</string>
 
-    <!-- Added missing keys with purpose strings -->
+    <!-- Additional keys for app functionality -->
     <key>NSCalendarsUsageDescription</key>
     <string>We need access to your calendars to track and schedule health-related events and appointments.</string>
     
@@ -81,6 +84,7 @@
     <key>NSBluetoothAlwaysUsageDescription</key>
     <string>We need access to Bluetooth to connect to health monitoring devices and sync data for better insights.</string>
 
+    <!-- Support for indirect input events and background modes -->
     <key>UIApplicationSupportsIndirectInputEvents</key>
     <true/>
     <key>UIBackgroundModes</key>
@@ -111,5 +115,12 @@
     <false/>
     <key>UNAuthorizationOptions</key>
     <string>alert, badge, sound</string>
+
+    <!-- NSAppTransportSecurity configuration to allow arbitrary loads -->
+    <key>NSAppTransportSecurity</key>
+    <dict>
+        <key>NSAllowsArbitraryLoads</key>
+        <true/>
+    </dict>
 </dict>
 </plist>
