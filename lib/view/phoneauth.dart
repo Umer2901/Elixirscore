@@ -59,7 +59,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 ),
                 SizedBox(height: 2.h),
                 Text(
-                  'Please confirm your country code and enter your phone number.',
+                  'Please enter your phone number.',
                   style: Theme.of(context).textTheme.bodySmall,
                 ),
                 SizedBox(height: 4.h),
@@ -86,7 +86,7 @@ class _PhoneAuthState extends State<PhoneAuth> {
                 Row(
                   children: [
                     Text(
-                      '+1   |',
+                      '+1   ',
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                             fontWeight: FontWeight.bold,
                           ),

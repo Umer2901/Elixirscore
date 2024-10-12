@@ -20,20 +20,15 @@ class _OtpScreenState extends State<OtpScreen> {
   bool isLoading = false;
   late String verificationId;
 
-  // @override
-  // void didChangeDependencies() {
-  //   super.didChangeDependencies();
-  //   verificationId = Get.arguments as String;
-  // }
-    @override
+  @override
   void didChangeDependencies() {
     super.didChangeDependencies();
     final args = Get.arguments;
     if (args != null && args is String) {
       verificationId = args;
     } else {
-     
-      // Get.back();
+      // Handle the case where the verificationId is not passed correctly
+    //  Get.back();
     }
   }
 
@@ -46,7 +41,7 @@ class _OtpScreenState extends State<OtpScreen> {
     );
   }
 
-  Widget _buildPinInputField() {
+  Widget _buildPinInputField(AuthProvider authProvider) {
     return Padding(
       padding: EdgeInsets.all(5.sp),
       child: SizedBox(
@@ -60,14 +55,41 @@ class _OtpScreenState extends State<OtpScreen> {
               AppColors.black,
             ),
           ),
-          onChanged: (String pin) {
+          autoFocus: true,
+          onChanged: (String pin) async {
             setState(() {
               otp = pin;
             });
+
+            // Automatically verify the OTP when all 6 digits are entered
+            if (otp.length == 6) {
+              await _verifyOtp(authProvider);
+            }
           },
         ),
       ),
     );
+  }
+
+  Future<void> _verifyOtp(AuthProvider authProvider) async {
+    if (otp.length < 6 || isLoading) {
+      return;
+    }
+
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      // Verify OTP using the authProvider
+      await authProvider.verifyOtp(context, verificationId, otp);
+    } catch (e) {
+      _showSnackbar('Verification failed: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   Widget _buildResendCodeButton(AuthProvider authProvider) {
@@ -93,8 +115,8 @@ class _OtpScreenState extends State<OtpScreen> {
         child: Text(
           'Resend Code',
           style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-            color: AppColors.primary,
-          ),
+                color: AppColors.primary,
+              ),
         ),
       ),
     );
@@ -106,7 +128,7 @@ class _OtpScreenState extends State<OtpScreen> {
     label: "Verify",
     onPressed: () async {
       if (otp.length < 6) {
-        _showSnackbar('Please enter the full OTP');
+        _showSnackbar('Please enter the full code');
         return;
       }
 
@@ -172,7 +194,7 @@ class _OtpScreenState extends State<OtpScreen> {
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 SizedBox(height: 3.h),
-                _buildPinInputField(),
+                _buildPinInputField(authProvider),
                 SizedBox(height: 2.h),
                 _buildResendCodeButton(authProvider),
                 SizedBox(height: 2.h),

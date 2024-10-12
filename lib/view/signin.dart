@@ -1,5 +1,3 @@
-// ignore_for_file: use_build_context_synchronously
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
@@ -11,6 +9,8 @@ import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dar
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Signin extends StatefulWidget {
   const Signin({super.key});
 
@@ -22,7 +22,27 @@ class _SigninState extends State<Signin> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool obsecurePassword = true;
-  bool isLoading = false; 
+  bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkLoginStatus();
+  }
+
+  Future<void> _checkLoginStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
+
+    if (isLoggedIn) {
+      Get.offAllNamed(AppRoutes.dashboard);
+    }
+  }
+
+  Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,24 +56,17 @@ class _SigninState extends State<Signin> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(child: Image.asset(AppImages.logo, height: 30.h, width: 50.w)),
-                  Text(
-                    "Email Address",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
-                  ),
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _emailController,
+                    keyboardType: TextInputType.text,
                     name: "email",
                     hintText: "Email Address",
                     prefixIcon: const Icon(Icons.email_outlined),
                   ),
                   SizedBox(height: 1.h),
-                  Text(
-                    "Password",
-                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
-                  ),
-                  SizedBox(height: 1.h),
                   CustomTextField(
+                      keyboardType: TextInputType.text,
                     controller: _passwordController,
                     name: "Password",
                     hintText: "Password",
@@ -66,9 +79,7 @@ class _SigninState extends State<Signin> {
                         });
                       },
                       child: Icon(
-                        obsecurePassword
-                            ? Icons.visibility_off_rounded
-                            : Icons.visibility_rounded,
+                        obsecurePassword ? Icons.visibility_off_rounded : Icons.visibility_rounded,
                       ),
                     ),
                   ),
@@ -89,30 +100,31 @@ class _SigninState extends State<Signin> {
                   ),
                   SizedBox(height: 2.h),
                   CustomButton(
-  isLoading: isLoading,
-  label: "Sign In",
-  onPressed: () async {
-    setState(() {
-      isLoading = true; 
-    });
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    try {
-      await authProvider.loginWithEmailAndPassword(
-        context,
-        _emailController.text,
-        _passwordController.text,
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Login failed: $e')),
-      );
-    } finally {
-      setState(() {
-        isLoading = false; 
-      });
-    }
-  },
-),
+                    isLoading: isLoading,
+                    label: "Sign In",
+                    onPressed: () async {
+                      setState(() {
+                        isLoading = true;
+                      });
+                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      try {
+                        await authProvider.loginWithEmailAndPassword(
+                          context,
+                          _emailController.text,
+                          _passwordController.text,
+                        );
+                        await _setLoginStatus(true);
+                      } catch (e) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('Login failed: $e')),
+                        );
+                      } finally {
+                        setState(() {
+                          isLoading = false;
+                        });
+                      }
+                    },
+                  ),
                   SizedBox(height: 3.h),
                   Row(
                     children: [
@@ -142,9 +154,7 @@ class _SigninState extends State<Signin> {
                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
                           await authProvider.signInWithApple(context);
 
-                          if (authProvider.user != null) {
-                            Get.offAndToNamed(AppRoutes.phoneAuth);
-                          }
+                      
                     },
                     child: SizedBox(
                       height: 8.h,
@@ -157,9 +167,7 @@ class _SigninState extends State<Signin> {
                        final authProvider = Provider.of<AuthProvider>(context, listen: false);
                           await authProvider.signInWithGoogle(context);
 
-                          if (authProvider.user != null) {
-                            Get.offAndToNamed(AppRoutes.phoneAuth);
-                          }
+                          
                     },
                     child: SizedBox(
                       height: 8.h,
@@ -200,3 +208,4 @@ class _SigninState extends State<Signin> {
     );
   }
 }
+

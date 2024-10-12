@@ -1,16 +1,1 @@
-# flutter_application_elixirscore
-
-A new Flutter project.
-
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+Elixirscore is a novel health scoring system designed to integrate various physiological and behavioral metrics to assess health and promote longevity by minimizing the risk of chronic diseases. The ElixirScore algorithm calculates a daily health score based on metrics such as Body Mass Index (BMI), diet, physical activity, heart rate, respiratory rate, screen time, sleep duration, step count, and sunlight exposure. Each metric is weighted according to its impact on cardiovascular, metabolic, and mental health, as supported by peer-reviewed research. This scoring system aims to provide individuals with actionable insights into their health habits, highlighting areas for improvement and encouraging behaviors that reduce the risk of chronic diseases and enhance overall well-being.

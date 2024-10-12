@@ -1,4 +1,3 @@
-
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
@@ -11,6 +10,7 @@ import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dar
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});
@@ -25,8 +25,12 @@ class _SignupState extends State<Signup> {
   final TextEditingController _confirmPasswordController = TextEditingController();
   bool _obsecurePassword = true;
   bool _obsecureConfirmPassword = true;
-
   bool isLoading = false;
+
+  Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,13 +44,14 @@ class _SignupState extends State<Signup> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Center(child: Image.asset(AppImages.logo, height: 30.h, width: 50.w)),
-                  Text(
+                   Text(
                     "Email Address",
                     style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
                   ),
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _emailController,
+                      keyboardType: TextInputType.text,
                     name: "email",
                     hintText: "Email Address",
                     prefixIcon: const Icon(Icons.email_outlined),
@@ -59,6 +64,7 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _passwordController,
+                      keyboardType: TextInputType.text,
                     name: "Password",
                     hintText: "Password",
                     obscureText: _obsecurePassword,
@@ -84,6 +90,7 @@ class _SignupState extends State<Signup> {
                   SizedBox(height: 1.h),
                   CustomTextField(
                     controller: _confirmPasswordController,
+                      keyboardType: TextInputType.text,
                     name: "Confirm Password",
                     hintText: "Confirm Password",
                     obscureText: _obsecureConfirmPassword,
@@ -129,7 +136,8 @@ class _SignupState extends State<Signup> {
                         );
 
                         if (authProvider.user != null) {
-                          Get.offAndToNamed(AppRoutes.phoneAuth, arguments: authProvider.user!.phoneNumber);
+                          await _setLoginStatus(true);
+                         // Get.offAndToNamed(AppRoutes.dashboard);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             const SnackBar(content: Text('Registration failed. Please try again.')),
@@ -162,7 +170,7 @@ class _SignupState extends State<Signup> {
                             style: Theme.of(context).textTheme.bodyMedium!.copyWith(),
                             children: <InlineSpan>[
                               TextSpan(
-                                text: 'Signin',
+                                text: 'Sign in',
                                 style: Theme.of(context).textTheme.bodyMedium!.copyWith(fontWeight: FontWeight.bold, color: AppColors.primary),
                               ),
                             ],

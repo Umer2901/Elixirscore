@@ -1,11 +1,17 @@
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
+import 'package:flutter_application_elixirscore/providers/health_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
+import 'package:flutter_application_elixirscore/view/chat.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
+import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:semicircle_indicator/semicircle_indicator.dart';
+import 'package:health/health.dart';
+import 'package:flutter/services.dart';
 
 class Dashboard extends StatefulWidget {
   const Dashboard({super.key});
@@ -15,797 +21,310 @@ class Dashboard extends StatefulWidget {
 }
 
 class _DashboardState extends State<Dashboard> {
+  static const platform = MethodChannel('com.elixir.elixirscore/deviceActivity'); // MethodChannel for native communication
+  String _errorMessage = '';
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      fetchData();
+      _startMonitoring();
+    });
+  }
+
+  Future<void> fetchData() async {
+    try {
+      // Trigger fetching health data from the provider
+      await Provider.of<HealthDataProvider>(context, listen: false).fetchHealthData();
+    } catch (e) {
+      setState(() {
+        _errorMessage = 'Failed to fetch health data.';
+      });
+    }
+  }
+
+  // Start screen time monitoring and request permission if needed
+  Future<void> _startMonitoring() async {
+    try {
+      await platform.invokeMethod('startMonitoring');
+      print("Screen time monitoring started.");
+      _getUsageData(); // Fetch initial screen time usage data
+    } on PlatformException catch (e) {
+      print("Failed to start monitoring: '${e.message}'.");
+    }
+  }
+
+  // Get the screen time usage data and update the HealthDataProvider
+  Future<void> _getUsageData() async {
+    try {
+      final String usage = await platform.invokeMethod('getUsageData');
+      print("Retrieved screen time: $usage");
+
+      // Assuming the usage data is in minutes, convert to a double value
+      double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
+
+      // Update the HealthDataProvider with the screen time value
+      Provider.of<HealthDataProvider>(context, listen: false).screenTime = screenTime;
+      Provider.of<HealthDataProvider>(context, listen: false).screenTimeScore =
+      Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
+
+      // Notify listeners to update UI or data dependencies
+      Provider.of<HealthDataProvider>(context, listen: false).notifyListeners();
+    } on PlatformException catch (e) {
+      print("Failed to get usage data: '${e.message}'.");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Sizer(builder: (context, orientation, deviceType) {
-      return Scaffold(
-        appBar: AppBar(
-          scrolledUnderElevation: 0.0,
-          surfaceTintColor: Colors.white,
-          leading: IconButton(
-              onPressed: () {
-                Get.toNamed(AppRoutes.profile);
-              },
-              icon: Icon(Icons.comment)),
-          actions: <Widget>[
-            IconButton(
-              icon: const Icon(Icons.comment),
-              tooltip: 'Comment Icon',
-              onPressed: () {},
-            ),
-          ],
-        ),
-        body: SingleChildScrollView(
-          child: Padding(
-            padding: EdgeInsets.all(8.sp),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text('ElixirScore',
-                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          fontFamily: AppFont.nexaBold, fontSize: 30.sp)),
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Center(
-                  child: SemicircularIndicator(
-                    strokeWidth: 10.sp,
-                    color: AppColors.primary,
-                    bottomPadding: 0,
-                    child: Text('75',
-                        style: Theme.of(context)
-                            .textTheme
-                            .displaySmall
-                            ?.copyWith(
-                                fontFamily: AppFont.nexaBold, fontSize: 45.sp)),
-                  ),
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Padding(
-                  padding: EdgeInsets.only(left: 29.sp, right: 35.sp),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text('Unhealthy',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontFamily: AppFont.nexaBold,
-                                  color: AppColors.grey)),
-                      Text('Healthy',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyLarge
-                              ?.copyWith(
-                                  fontFamily: AppFont.nexaBold,
-                                  color: AppColors.primary)),
-                    ],
-                  ),
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('Scoring Factors',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Text('Learn more',
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodySmall
-                                ?.copyWith(
-                                    color: AppColors.primary,
-                                    fontWeight: FontWeight.bold)),
-                      ],
-                    ),
-                    CustomButton(
-                        height: 5.h,
-                        width: 30.w,
-                        label: "Sync",
-                        onPressed: () {})
-                  ],
-                ),
-                SizedBox(
-                  height: 3.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Diet 🥣️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('96%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: index < 3
-                                    ? AppColors.primary
-                                    : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Energy 🔥️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('71%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: index < 2
-                                    ? AppColors.green
-                                    : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Heart ❤️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('18%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color:
-                                    index < 1 ? AppColors.red : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Respiration 🫁️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('25%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color:
-                                    index < 1 ? AppColors.red : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Screen Time 📱️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('75%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: index < 2
-                                    ? AppColors.green
-                                    : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Sleep 🛏️️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('55%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color:
-                                    index < 1 ? AppColors.red : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Steps 🚶🏻️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('100%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: index < 3
-                                    ? AppColors.primary
-                                    : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text('Sunlight ☀️️',
-                            style: Theme.of(context)
-                                .textTheme
-                                .headlineSmall
-                                ?.copyWith()),
-                        Row(
-                          children: [
-                            Text('98%',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodyLarge
-                                    ?.copyWith()),
-                            const Icon(
-                              Icons.keyboard_arrow_down_rounded,
-                              color: AppColors.primary,
-                            )
-                          ],
-                        ),
-                      ],
-                    ),
-                    SizedBox(
-                      height: 1.5.h,
-                    ),
-                    SizedBox(
-                      width: 75.w,
-                      child: Row(
-                        children: List.generate(3, (index) {
-                          return Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(25),
-                                color: index < 3
-                                    ? AppColors.primary
-                                    : AppColors.grey,
-                              ),
-                              height: 5.sp,
-                              margin: EdgeInsets.symmetric(horizontal: 1.sp),
-                            ),
-                          );
-                        }),
-                      ),
-                    ),
-                  ],
-                ),
-                SizedBox(
-                  height: 2.h,
+    return Consumer<HealthDataProvider>(
+      builder: (context, provider, child) {
+        double elixirScore = calculateElixirScore(provider);
+
+        return Sizer(builder: (context, orientation, deviceType) {
+          return Scaffold(
+            appBar: AppBar(
+             scrolledUnderElevation: 0.0,
+             forceMaterialTransparency: true,
+surfaceTintColor: Colors.transparent,
+              
+    
+              leading: IconButton(
+                onPressed: () {
+                  Get.toNamed(AppRoutes.profile);
+                },
+                icon: const Icon(Icons.person_2_outlined),
+              ),
+              actions: <Widget>[
+                IconButton(
+                  icon: const Icon(Icons.comment),
+                  tooltip: 'Comment Icon',
+                  onPressed: () {
+                Navigator.push(context, MaterialPageRoute(builder: (context)=> ChatScreen()));
+          
+                  },
                 ),
               ],
             ),
+            body: SingleChildScrollView(
+              child: Padding(
+                padding: EdgeInsets.all(8.sp),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Text(
+                        'ElixirScore',
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              fontFamily: AppFont.nexaBold,
+                              fontSize: 30.sp,
+                            ),
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Center(
+                      child: SemicircularIndicator(
+                        progress: elixirScore / 100,
+                        strokeWidth: 10.sp,
+                        color: getColorForScore(elixirScore),
+                        bottomPadding: 0,
+                        child: Text(
+                          elixirScore.toStringAsFixed(1),
+                          style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                                fontFamily: AppFont.nexaBold,
+                                fontSize: 45.sp,
+                              ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 29.sp),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Unhealthy',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  fontFamily: AppFont.nexaBold,
+                                  color: AppColors.grey,
+                                ),
+                          ),
+                          Text(
+                            'Healthy',
+                            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                                  fontFamily: AppFont.nexaBold,
+                                  color: AppColors.primary,
+                                ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 2.h),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Scoring Factors',
+                              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                // Navigate to more info
+                              },
+                              child: Text(
+                                'Learn more',
+                                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        CustomButton(
+                          height: 5.h,
+                          width: 30.w,
+                          label: "Sync",
+                          onPressed: () {
+                            provider.fetchHealthData(); // Fetch the latest health data
+                            _startMonitoring(); // Start monitoring screen time data
+                          },
+                        ),
+                      ],
+                    ),
+                    SizedBox(height: 2.h),
+                    buildMetricsSection(context, provider),
+                    SizedBox(height: 2.h),
+                  ],
+                ),
+              ),
+            ),
+          );
+        });
+      },
+    );
+  }
+
+   Widget buildMetricsSection(BuildContext context, HealthDataProvider provider) {
+    return Column(
+      children: [
+        buildMetricSection(context, "BMI 🥣️", "BMI", provider.bmi, provider.bmiScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Nutrition 🥗", "Diet", provider.diet, provider.dietScore),
+         SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Energy 🔥️", "Energy Burn", provider.energyBurn, provider.energyScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Heart ❤️", "Heart Rate", provider.heartRate, provider.heartScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, provider.respirationScore),
+         SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
+        SizedBox(
+          height: 1.h,
+        ),
+        buildMetricSection(context, "Steps 🚶🏻️", "Steps", provider.steps, provider.stepsScore),
+     //   buildMetricSection(context, "Daylight ☀️️", "Daylight", provider.sunlight, provider.daylightScore),
+      ],
+    );
+  }
+
+  
+
+  Widget buildMetricSection(BuildContext context, String title, String metricName, double value, double percentage) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              title,
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
+            ),
+            Row(
+              children: [
+                Text(
+                  '${percentage.toInt()}%',
+                  style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
+                ),
+                const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
+              ],
+            ),
+          ],
+        ),
+        SizedBox(height: 1.5.h),
+        SizedBox(
+          width: 75.w,
+          child: Row(
+            children: List.generate(3, (index) {
+              bool active = percentage > (index * 33.3);
+              return Expanded(
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(25),
+                    color: active ? getColorForScore(percentage) : AppColors.grey,
+                  ),
+                  height: 5.sp,
+                  margin: EdgeInsets.symmetric(horizontal: 1.sp),
+                ),
+              );
+            }),
           ),
         ),
-      );
-    });
+      ],
+    );
+  }
+
+  double calculateElixirScore(HealthDataProvider provider) {
+    // Apply weightages to each metric's score
+    double bmiWeightedScore = provider.bmiScore * 0.05; // 5% weightage
+    double dietWeightedScore = provider.dietScore * 0.10; // 10% weightage
+    double energyBurnWeightedScore = provider.energyScore * 0.15; // 15% weightage
+    double heartWeightedScore = provider.heartScore * 0.15; // 15% weightage
+    double respirationWeightedScore = provider.respirationScore * 0.10; // 10% weightage
+    double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage
+    double sleepWeightedScore = provider.sleepScore * 0.20; // 20% weightage
+    double stepsWeightedScore = provider.stepsScore * 0.15; // 15% weightage
+
+    // Calculate total weighted score by summing up all weighted scores
+    double totalWeightedScore = bmiWeightedScore +
+        dietWeightedScore +
+        energyBurnWeightedScore +
+        heartWeightedScore +
+        respirationWeightedScore +
+        screenTimeWeightedScore +
+        sleepWeightedScore +
+        stepsWeightedScore;
+
+    // Cap the total score at 100 if it exceeds that value
+    return totalWeightedScore.clamp(0, 100);
+  }
+
+  Color getColorForScore(double percentage) {
+    if (percentage <= 33.3) {
+      return AppColors.red;
+    } else if (percentage <= 66.6)
+      return AppColors.green;
+    else
+      return AppColors.primary;
   }
 }
-// import 'package:flutter/material.dart';
-// import 'package:flutter_application_elixirscore/constants/colors.dart';
-// import 'package:flutter_application_elixirscore/constants/fonts.dart';
-// import 'package:flutter_application_elixirscore/routes/app_routes.dart';
-// import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
-// import 'package:get/get.dart';
-// import 'package:sizer/sizer.dart';
-// import 'package:semicircle_indicator/semicircle_indicator.dart';
-
-// class HealthMetric {
-//   final String name;
-//   final double value;
-//   final double weight;
-//   final double rangeMin;
-//   final double rangeMax;
-
-//   HealthMetric(this.name, this.value, this.weight, this.rangeMin, this.rangeMax);
-
-//   double calculateScore() {
-//     if (name == "Diet" || name == "Energy Burn" || name == "Steps" || name == "Sunlight") {
-//       // Higher is better
-//       if (value > rangeMax) {
-//         return 100 - 100 * ((value - rangeMax) / (value - rangeMax + rangeMax - rangeMin)).clamp(0, 100);
-//       } else if (value < rangeMin) {
-//         return 100 - 100 * ((rangeMin - value) / (rangeMin - rangeMax)).clamp(0, 100);
-//       } else {
-//         return 100;
-//       }
-//     } else {
-//       // Lower is better
-//       if (value < rangeMin) {
-//         return 100 - 100 * ((rangeMin - value) / (rangeMin - rangeMax)).clamp(0, 100);
-//       } else if (value > rangeMax) {
-//         return 100 - 100 * ((value - rangeMax) / (value - rangeMax + rangeMax - rangeMin)).clamp(0, 100);
-//       } else {
-//         return 100;
-//       }
-//     }
-//   }
-
-//   double weightedScore() {
-//     return (calculateScore() * weight) / 100;
-//   }
-// }
-
-// class Dashboard extends StatefulWidget {
-//   const Dashboard({super.key});
-
-//   @override
-//   State<Dashboard> createState() => _DashboardState();
-// }
-
-// class _DashboardState extends State<Dashboard> {
-//   // Define initial values for metrics
-//   double bmi = 1700.0;
-//   double diet = 20000;
-//   double energyBurn = 2040;
-//   double heartRate = 690;
-//   double respiration = 22.5;
-//   double screenTime = 360;
-//   double sleep = 390;
-//   double steps = 655;
-//   double sunlight = 50;
-
-//   // Function to calculate Elixir Score
-//   double calculateElixirScore() {
-//     List<HealthMetric> metrics = [
-//       HealthMetric("BMI", bmi, 50, 18.5, 24.9),
-//       HealthMetric("Diet", diet, 10, 2000, 3000),
-//       HealthMetric("Energy Burn", energyBurn, 15, 200, 400),
-//       HealthMetric("Heart", heartRate, 10, 50, 80),
-//       HealthMetric("Respiration", respiration, 5, 12, 25),
-//       HealthMetric("Screen Time", screenTime, 15, 60, 120),
-//       HealthMetric("Sleep", sleep, 20, 420, 540),
-//       HealthMetric("Steps", steps, 10, 7000, 10000),
-//       HealthMetric("Sunlight", sunlight, 10, 30, 90),
-//     ];
-
-//     double totalWeightedScore = metrics.map((m) => m.weightedScore()).reduce((a, b) => a + b);
-//     double totalWeight = metrics.map((m) => m.weight).reduce((a, b) => a + b);
-//     return (totalWeightedScore / totalWeight) * 100;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     double elixirScore = calculateElixirScore();
-
-//     return Sizer(builder: (context, orientation, deviceType) {
-//       return Scaffold(
-//         appBar: AppBar(
-//           leading: IconButton(
-//             onPressed: () {
-//               Get.toNamed(AppRoutes.profile);
-//             },
-//             icon: const Icon(Icons.person_2_outlined),
-//           ),
-//           actions: <Widget>[
-//             IconButton(
-//               icon: const Icon(Icons.comment),
-//               tooltip: 'Comment Icon',
-//               onPressed: () {},
-//             ),
-//           ],
-//         ),
-//         body: SingleChildScrollView(
-//           child: Padding(
-//             padding: EdgeInsets.all(8.sp),
-//             child: Column(
-//               crossAxisAlignment: CrossAxisAlignment.start,
-//               children: [
-//                 Center(
-//                   child: Text(
-//                     'ElixirScore',
-//                     style: Theme.of(context).textTheme.displaySmall?.copyWith(
-//                       fontFamily: AppFont.nexaBold,
-//                       fontSize: 30.sp,
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 2.h),
-//                 Center(
-//                   child: SemicircularIndicator(
-//                     strokeWidth: 10.sp,
-//                     color: AppColors.primary,
-//                     bottomPadding: 0,
-//                     child: Text(
-//                       elixirScore.toStringAsFixed(1),
-//                       style: Theme.of(context).textTheme.displaySmall?.copyWith(
-//                         fontFamily: AppFont.nexaBold,
-//                         fontSize: 45.sp,
-//                       ),
-//                     ),
-//                   ),
-//                 ),
-//                 SizedBox(height: 2.h),
-//                 Padding(
-//                   padding: EdgeInsets.only(left: 29.sp, right: 35.sp),
-//                   child: Row(
-//                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                     children: [
-//                       Text(
-//                         'Unhealthy',
-//                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-//                           fontFamily: AppFont.nexaBold,
-//                           color: AppColors.grey,
-//                         ),
-//                       ),
-//                       Text(
-//                         'Healthy',
-//                         style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-//                           fontFamily: AppFont.nexaBold,
-//                           color: AppColors.primary,
-//                         ),
-//                       ),
-//                     ],
-//                   ),
-//                 ),
-//                 SizedBox(height: 2.h),
-//                 Row(
-//                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//                   children: [
-//                     Column(
-//                       crossAxisAlignment: CrossAxisAlignment.start,
-//                       children: [
-//                         Text(
-//                           'Scoring Factors',
-//                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
-//                         ),
-//                         Text(
-//                           'Learn more',
-//                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
-//                             color: AppColors.primary,
-//                             fontWeight: FontWeight.bold,
-//                           ),
-//                         ),
-//                       ],
-//                     ),
-//                     CustomButton(
-//                       height: 5.h,
-//                       width: 30.w,
-//                       label: "Sync",
-//                       onPressed: () {
-//                         setState(() {
-//                           // Update metrics values and recalculate Elixir Score
-//                           // For demonstration purposes, these values are static
-//                           // Replace with actual dynamic updates
-//                         });
-//                       },
-//                     ),
-//                   ],
-//                 ),
-//                 SizedBox(height: 3.h),
-//                 buildMetricSection('Diet 🥣️', diet, 96, AppColors.primary, 3, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Energy 🔥️', energyBurn, 71, AppColors.green, 2, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Heart ❤️', heartRate, 18, AppColors.red, 1, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Respiration 🫁️', respiration, 25, AppColors.red, 1, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Screen Time 📱️', screenTime, 75, AppColors.green, 2, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Sleep 🛏️️', sleep, 55, AppColors.red, 1, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Steps 🚶🏻️', steps, 100, AppColors.primary, 3, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//                 buildMetricSection('Sunlight ☀️️', sunlight, 98, AppColors.primary, 3, AppColors.grey),
-//                 SizedBox(height: 2.h),
-//               ],
-//             ),
-//           ),
-//         ),
-//       );
-//     });
-//   }
-
-//   Widget buildMetricSection(String title, double value, int percentage, Color barColor, int colorIndex, Color defaultColor) {
-//     return Column(
-//       crossAxisAlignment: CrossAxisAlignment.start,
-//       children: [
-//         Row(
-//           mainAxisAlignment: MainAxisAlignment.spaceBetween,
-//           children: [
-//             Text(
-//               title,
-//               style: Theme.of(context).textTheme.headlineSmall?.copyWith(),
-//             ),
-//             Row(
-//               children: [
-//                 Text(
-//                   '$percentage%',
-//                   style: Theme.of(context).textTheme.bodyLarge?.copyWith(),
-//                 ),
-//                 const Icon(Icons.keyboard_arrow_down_rounded, color: AppColors.primary),
-//               ],
-//             ),
-//           ],
-//         ),
-//         SizedBox(height: 1.5.h),
-//         SizedBox(
-//           width: 75.w,
-//           child: Row(
-//             children: List.generate(3, (index) {
-//               return Expanded(
-//                 child: Container(
-//                   decoration: BoxDecoration(
-//                     borderRadius: BorderRadius.circular(25),
-//                     color: index < colorIndex ? barColor : defaultColor,
-//                   ),
-//                   height: 5.sp,
-//                   margin: EdgeInsets.symmetric(horizontal: 1.sp),
-//                 ),
-//               );
-//             }),
-//           ),
-//         ),
-//       ],
-//     );
-//   }
-// }
