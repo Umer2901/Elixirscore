@@ -28,7 +28,7 @@ class ChatGPTService {
             'Authorization': 'Bearer $OPENAI_API_KEY', // Ensure this is the correct API key
           },
           body: jsonEncode({
-            "model": "gpt-4", // Use "gpt-3.5-turbo" if you don't have access to gpt-4
+            "model": "chatgpt-4o-latest", // Use "gpt-3.5-turbo" if you don't have access to gpt-4
             "messages": [
               {
                 "role": "system",

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
+import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
 import 'package:flutter_application_elixirscore/providers/health_provider.dart';
 import 'package:flutter_application_elixirscore/providers/loading_provider.dart';
@@ -82,6 +83,7 @@ class _DashboardState extends State<Dashboard> {
      final loadingprovider = Provider.of<LoadingProvider>(context);
     return Consumer<HealthDataProvider>(
       builder: (context, provider, child) {
+        final basicInfoProvider = Provider.of<BasicInfoProvider>(context, listen: false);
         double elixirScore = calculateElixirScore(provider);
 
         return Sizer(builder: (context, orientation, deviceType) {
@@ -117,36 +119,17 @@ surfaceTintColor: Colors.transparent,
     onTap: () async {
       await basicInfoProvider.loadBasicInfo();
       if (basicInfoProvider.basicInfo != null) {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => ChatScreen(uid: basicInfoProvider.basicInfo!.uid),
-          ),
-        );
+        Get.toNamed(AppRoutes.chat,arguments:basicInfoProvider.basicInfo!.uid );
       }
     },
     child: Image.asset(
-      'assets/images/icon.png',
+     AppImages.bluelogo,
       height: 25.sp,
     ),
   ),
 )
 
-            //     IconButton(
-            //       icon: const Icon(Icons.comment),
-            //       tooltip: 'Comment Icon',
-            //         onPressed: () async {
-            // await basicInfoProvider.loadBasicInfo();
-            // if (basicInfoProvider.basicInfo != null) {
-            //   Navigator.push(
-            //     context,
-            //     MaterialPageRoute(
-            //       builder: (context) => ChatScreen(uid: basicInfoProvider.basicInfo!.uid),
-            //     ),
-            //   );
-          //   }
-          // },
-          //       ),
+        
               ],
             ),
             body: SingleChildScrollView(
