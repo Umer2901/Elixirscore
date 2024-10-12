@@ -1,8 +1,9 @@
+// ignore_for_file: unnecessary_brace_in_string_interps
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
-import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';

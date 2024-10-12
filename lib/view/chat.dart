@@ -1,7 +1,8 @@
+// ignore_for_file: library_private_types_in_public_api, use_super_parameters
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_application_elixirscore/providers/chat_provider.dart';
-import 'package:flutter_application_elixirscore/constants/images.dart';
 import 'package:get/get.dart';
 
 class ChatScreen extends StatefulWidget {

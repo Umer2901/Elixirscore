@@ -1,4 +1,6 @@
 
+// ignore_for_file: unused_field, unused_local_variable, curly_braces_in_flow_control_structures
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
@@ -7,13 +9,11 @@ import 'package:flutter_application_elixirscore/providers/basic_info_provider.da
 import 'package:flutter_application_elixirscore/providers/health_provider.dart';
 import 'package:flutter_application_elixirscore/providers/loading_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
-import 'package:flutter_application_elixirscore/view/chat.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
 import 'package:semicircle_indicator/semicircle_indicator.dart';
-import 'package:health/health.dart';
 import 'package:flutter/services.dart';
 
 class Dashboard extends StatefulWidget {

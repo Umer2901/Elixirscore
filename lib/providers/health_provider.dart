@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'dart:io';
 import 'dart:math'; // Required for the max and min functions
 import 'package:flutter/material.dart';

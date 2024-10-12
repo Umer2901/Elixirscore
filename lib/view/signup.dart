@@ -10,7 +10,6 @@ import 'package:flutter_application_elixirscore/view/widget/custom_textfield.dar
 import 'package:get/get.dart';
 import 'package:provider/provider.dart';
 import 'package:sizer/sizer.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class Signup extends StatefulWidget {
   const Signup({super.key});

@@ -1,1 +1,3 @@
+// ignore_for_file: constant_identifier_names
+
 const OPENAI_API_KEY = "sk-q3_KddnQ5Ovaky4EApfShiHwUlXu4_SETEjuqbTBjST3BlbkFJh3E6yQNFlQF58RwKV-eqWTf1Pzjz1XXXDhYA8W7h4A";

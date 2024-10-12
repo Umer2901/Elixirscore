@@ -65,15 +65,15 @@ class AppPages extends AppRoutes {
     ),
      GetPage(
       name: AppRoutes.termandservices,
-      page: () => TermsAndServices(),
+      page: () => const TermsAndServices(),
     ),
      GetPage(
       name: AppRoutes.privacy,
-      page: () => Privacy(),
+      page: () => const Privacy(),
     ),
       GetPage(
       name: AppRoutes.contact,
-      page: () => ExperienceForm(),
+      page: () => const ExperienceForm(),
     ),
     GetPage(
       name: AppRoutes.updatebasicinfo,
@@ -85,7 +85,7 @@ class AppPages extends AppRoutes {
     ),
        GetPage(
       name: AppRoutes.chat,
-      page: () =>  ChatScreen(),
+      page: () =>  const ChatScreen(),
        arguments: Get.arguments,
     ),
     
