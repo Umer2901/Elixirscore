@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_application_elixirscore/constants/key.dart';
 import 'package:flutter_application_elixirscore/providers/chat_services.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  final String uid; // UID for identifying the user in Firestore
+
+  const ChatScreen({Key? key, required this.uid}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -17,10 +20,12 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   late AnimationController _animationController;
   late Animation<double> _animation;
 
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   @override
   void initState() {
     super.initState();
-    _loadChatHistory();
+    _loadChatHistory(); // Load chat history from Firestore on initialization
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -37,31 +42,86 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
     super.dispose();
   }
 
+  // Load chat history from Firestore
   void _loadChatHistory() async {
-    // Implement chat history loading logic here if needed
-    setState(() {});
+    try {
+      // Get the document for the current user based on UID
+      final doc = await _firestore.collection('chats').doc(widget.uid).get();
+
+      // If document exists, load the messages array into chatHistory
+      if (doc.exists) {
+        final data = doc.data();
+        final List<dynamic> messages = data?['messages'] ?? [];
+
+        setState(() {
+          chatHistory = messages
+              .map((message) => {
+                    'role': message['role'] as String,
+                    'content': message['content'] as String,
+                  })
+              .toList();
+        });
+      }
+    } catch (e) {
+      print('Error loading chat history: $e');
+    }
   }
 
-  void _clearChatHistory() {
+  // Save a message to Firestore in a messages array
+  Future<void> _saveMessageToFirestore(String role, String content) async {
+    try {
+      // Get the current document for the user
+      final chatDocRef = _firestore.collection('chats').doc(widget.uid);
+
+      // Create a message map
+      final newMessage = {'role': role, 'content': content};
+
+      // Update the document with a new message in the messages array
+      await chatDocRef.set({
+        'messages': FieldValue.arrayUnion([newMessage]),
+      }, SetOptions(merge: true));
+    } catch (e) {
+      print('Error saving message to Firestore: $e');
+    }
+  }
+
+  // Clear chat history in Firestore and locally
+  void _clearChatHistory() async {
     setState(() {
       chatHistory.clear();
     });
+
+    try {
+      // Clear the messages array in Firestore for the specific user
+      await _firestore.collection('chats').doc(widget.uid).update({
+        'messages': [],
+      });
+    } catch (e) {
+      print('Error clearing chat history: $e');
+    }
   }
 
+  // Handle sending a message
   void _sendMessage() async {
     String text = _controller.text.trim();
     if (text.isNotEmpty) {
       _animationController.forward().then((_) {
         _animationController.reset();
       });
+
+      // Save user message locally and in Firestore
       setState(() {
         chatHistory.add({"role": "user", "content": text});
       });
       _controller.clear();
+      await _saveMessageToFirestore('user', text);
+
+      // Get the AI response and save it locally and in Firestore
       String response = await chatGPTService.getChatResponse(text, chatHistory);
       setState(() {
         chatHistory.add({"role": "assistant", "content": response});
       });
+      await _saveMessageToFirestore('assistant', response);
     }
   }
 
@@ -72,7 +132,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         backgroundColor: Colors.grey[100],
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.arrow_back_ios, color: Colors.blue),
+          icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
           onPressed: () {
             Navigator.of(context).pop();
           },
@@ -85,7 +145,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.share, color: Colors.blue),
+            icon: const Icon(Icons.delete, color: Colors.blue),
             onPressed: _clearChatHistory,
           )
         ],
@@ -135,10 +195,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                     Expanded(
                       child: TextField(
                         controller: _controller,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           hintText: "Message Elixir 😊",
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
                         ),
                         keyboardType: TextInputType.multiline,
                         textInputAction: TextInputAction.newline,
@@ -188,7 +248,7 @@ class CustomUpArrowButton extends StatelessWidget {
       child: Container(
         width: size,
         height: size,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           shape: BoxShape.circle,
           color: Colors.blue,
         ),

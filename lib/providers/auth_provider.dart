@@ -23,7 +23,7 @@ class AuthProvider with ChangeNotifier {
       UserCredential userCredential = await _auth.createUserWithEmailAndPassword(email: email, password: password);
       _user = userCredential.user;
       notifyListeners();
-      Get.toNamed(AppRoutes.phoneAuth);
+      Get.toNamed(AppRoutes.permission);
     } on FirebaseAuthException catch (e) {
       _showErrorSnackbar(context, e.message ?? 'An unknown error occurred');
     }
@@ -40,11 +40,9 @@ Future<void> _setLoginStatus(bool status) async {
     if (_user != null) {
       final phoneNumber = _user!.phoneNumber;
 
-      if (phoneNumber == null) {
-        Get.toNamed(AppRoutes.phoneAuth);
-      } else {
-        await verifyPhoneNumber(context, phoneNumber);
-      }
+
+        Get.toNamed(AppRoutes.permission);
+    
     }
 
     notifyListeners();
@@ -83,13 +81,9 @@ Future<void> _setLoginStatus(bool status) async {
     if (_user != null) {
       final phoneNumber = _user!.phoneNumber;
 
-      if (phoneNumber == null) {
-        // If phone number is not available, navigate to phoneAuth screen to add phone number
-        Get.toNamed(AppRoutes.phoneAuth);
-      } else {
-        // Verify the registered phone number
-        await verifyPhoneNumber(context, phoneNumber);
-      }
+     
+         Get.toNamed(AppRoutes.permission);
+   
     }
 
     await _setLoginStatus(true);
@@ -121,13 +115,9 @@ Future<void> signInWithApple(BuildContext context) async {
     if (_user != null) {
       final phoneNumber = _user!.phoneNumber;
 
-      if (phoneNumber == null) {
-        // If phone number is not available, navigate to phoneAuth screen to add phone number
-        Get.toNamed(AppRoutes.phoneAuth);
-      } else {
-        // Verify the registered phone number
-        await verifyPhoneNumber(context, phoneNumber);
-      }
+    
+        Get.toNamed(AppRoutes.permission);
+      
     }
 
     await _setLoginStatus(true);

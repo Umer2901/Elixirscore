@@ -7,12 +7,20 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:1062788782978:android:2f66f304fd7723578b4d9b",
+        "mobilesdk_app_id": "1:1062788782978:android:b484e16ae15e47178b4d9b",
         "android_client_info": {
-          "package_name": "com.example.flutter_application_elixirscore"
+          "package_name": "com.elixir.elixirscore"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "1062788782978-ug2gr28qlo32gdao4kdin4a2ubghc4cl.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.elixir.elixirscore",
+            "certificate_hash": "b8fdd80fb3808c3078b09965a411b161e7da0803"
+          }
+        },
         {
           "client_id": "1062788782978-1mg4m26h1atic15qf5jeesvgel1rj899.apps.googleusercontent.com",
           "client_type": 3
@@ -29,6 +37,57 @@
             {
               "client_id": "1062788782978-1mg4m26h1atic15qf5jeesvgel1rj899.apps.googleusercontent.com",
               "client_type": 3
+            },
+            {
+              "client_id": "1062788782978-7t5vt3gg6trdvq3qlmn02r0otsle25i3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.elixir.elixirscore"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1062788782978:android:2f66f304fd7723578b4d9b",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_elixirscore"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1062788782978-102kcrv1t8ckesihcrl4p4788i3lsepn.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.flutter_application_elixirscore",
+            "certificate_hash": "b8fdd80fb3808c3078b09965a411b161e7da0803"
+          }
+        },
+        {
+          "client_id": "1062788782978-1mg4m26h1atic15qf5jeesvgel1rj899.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDqkPY9CLy2WiQxnNeeSI6lfWCT5N8HV8A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1062788782978-1mg4m26h1atic15qf5jeesvgel1rj899.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1062788782978-7t5vt3gg6trdvq3qlmn02r0otsle25i3.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.elixir.elixirscore"
+              }
             }
           ]
         }
