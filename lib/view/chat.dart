@@ -1,32 +1,38 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter_application_elixirscore/constants/colors.dart';
-import 'package:flutter_application_elixirscore/constants/key.dart';
-import 'package:flutter_application_elixirscore/providers/chat_services.dart';
-import 'package:flutter_application_elixirscore/constants/images.dart';
+import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
+import 'package:flutter_application_elixirscore/routes/app_routes.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_application_elixirscore/providers/chat_provider.dart';
+import 'package:get/get.dart';
 
 class ChatScreen extends StatefulWidget {
-  final String uid; // UID for identifying the user in Firestore
-
-  const ChatScreen({Key? key, required this.uid}) : super(key: key);
+  const ChatScreen({Key? key}) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateMixin {
-  final TextEditingController _controller = TextEditingController();
-  final ChatGPTService chatGPTService = ChatGPTService(OPENAI_API_KEY);
-  List<Map<String, String>> chatHistory = [];
   late AnimationController _animationController;
   late Animation<double> _animation;
-
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
     super.initState();
-    _loadChatHistory(); // Load chat history from Firestore on initialization
+    
+    final basicInfoProvider = Provider.of<BasicInfoProvider>(context, listen: false);
+    if (basicInfoProvider.basicInfo != null) {
+      String uid = basicInfoProvider.basicInfo!.uid;
+      Provider.of<ChatProvider>(context, listen: false).loadChatHistory(uid);
+    } else {
+      basicInfoProvider.loadBasicInfo().then((_) {
+        if (basicInfoProvider.basicInfo != null) {
+          String uid = basicInfoProvider.basicInfo!.uid;
+          Provider.of<ChatProvider>(context, listen: false).loadChatHistory(uid);
+        }
+      });
+    }
+
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -39,95 +45,14 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
   @override
   void dispose() {
     _animationController.dispose();
-    _controller.dispose();
     super.dispose();
-  }
-
-  // Load chat history from Firestore
-  void _loadChatHistory() async {
-    try {
-      // Get the document for the current user based on UID
-      final doc = await _firestore.collection('chats').doc(widget.uid).get();
-
-      // If document exists, load the messages array into chatHistory
-      if (doc.exists) {
-        final data = doc.data();
-        final List<dynamic> messages = data?['messages'] ?? [];
-
-        setState(() {
-          chatHistory = messages
-              .map((message) => {
-                    'role': message['role'] as String,
-                    'content': message['content'] as String,
-                  })
-              .toList();
-        });
-      }
-    } catch (e) {
-      print('Error loading chat history: $e');
-    }
-  }
-
-  // Save a message to Firestore in a messages array
-  Future<void> _saveMessageToFirestore(String role, String content) async {
-    try {
-      // Get the current document for the user
-      final chatDocRef = _firestore.collection('chats').doc(widget.uid);
-
-      // Create a message map
-      final newMessage = {'role': role, 'content': content};
-
-      // Update the document with a new message in the messages array
-      await chatDocRef.set({
-        'messages': FieldValue.arrayUnion([newMessage]),
-      }, SetOptions(merge: true));
-    } catch (e) {
-      print('Error saving message to Firestore: $e');
-    }
-  }
-
-  // Clear chat history in Firestore and locally
-  void _clearChatHistory() async {
-    setState(() {
-      chatHistory.clear();
-    });
-
-    try {
-      // Clear the messages array in Firestore for the specific user
-      await _firestore.collection('chats').doc(widget.uid).update({
-        'messages': [],
-      });
-    } catch (e) {
-      print('Error clearing chat history: $e');
-    }
-  }
-
-  // Handle sending a message
-  void _sendMessage() async {
-    String text = _controller.text.trim();
-    if (text.isNotEmpty) {
-      _animationController.forward().then((_) {
-        _animationController.reset();
-      });
-
-      // Save user message locally and in Firestore
-      setState(() {
-        chatHistory.add({"role": "user", "content": text});
-      });
-      _controller.clear();
-      await _saveMessageToFirestore('user', text);
-
-      // Get the AI response and save it locally and in Firestore
-      String response = await chatGPTService.getChatResponse(text, chatHistory);
-      setState(() {
-        chatHistory.add({"role": "assistant", "content": response});
-      });
-      await _saveMessageToFirestore('assistant', response);
-    }
   }
 
   @override
   Widget build(BuildContext context) {
+    final chatProvider = Provider.of<ChatProvider>(context);
+    final basicInfoProvider = Provider.of<BasicInfoProvider>(context, listen: false);
+    
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.grey[100],
@@ -135,7 +60,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios, color: Colors.blue),
           onPressed: () {
-            Navigator.of(context).pop();
+            Get.toNamed(AppRoutes.dashboard);
           },
         ),
         title: Image.asset(
@@ -146,7 +71,15 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
         actions: [
           IconButton(
             icon: const Icon(Icons.delete, color: Colors.blue),
-            onPressed: _clearChatHistory,
+            onPressed: () async {
+              await basicInfoProvider.loadBasicInfo();
+     
+              // Get the UID again to clear the chat history for this user
+              if (basicInfoProvider.basicInfo != null) {
+                String uid = basicInfoProvider.basicInfo!.uid;
+                chatProvider.clearChatHistory(uid);
+              }
+            },
           )
         ],
       ),
@@ -156,10 +89,10 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: chatHistory.length,
+                itemCount: chatProvider.chatHistory.length,
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 60),
                 itemBuilder: (context, index) {
-                  final entry = chatHistory[index];
+                  final entry = chatProvider.chatHistory[index];
                   final isUser = entry['role'] == 'user';
                   return Align(
                     alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
@@ -194,7 +127,7 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                   children: [
                     Expanded(
                       child: TextField(
-                        controller: _controller,
+                        controller: chatProvider.controller,
                         decoration: const InputDecoration(
                           hintText: "Message Elixir 😊",
                           border: InputBorder.none,
@@ -216,7 +149,12 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
                         );
                       },
                       child: CustomUpArrowButton(
-                        onPressed: _sendMessage,
+                        onPressed: () {
+                          if (basicInfoProvider.basicInfo != null) {
+                            String uid = basicInfoProvider.basicInfo!.uid;
+                            chatProvider.sendMessage(uid);
+                          }
+                        },
                         size: 40.0,
                       ),
                     ),

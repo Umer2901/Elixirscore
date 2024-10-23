@@ -3,6 +3,7 @@
 
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/basicinfo.dart';
+import 'package:flutter_application_elixirscore/view/chat.dart';
 import 'package:flutter_application_elixirscore/view/dashboard.dart';
 import 'package:flutter_application_elixirscore/view/forgot.dart';
 import 'package:flutter_application_elixirscore/view/otp.dart';
@@ -81,6 +82,11 @@ class AppPages extends AppRoutes {
     GetPage(
       name: AppRoutes.accountinfo,
       page: () => const AccountInfo(),
+    ),
+     GetPage(
+      name: AppRoutes.chat,
+      page: () =>  ChatScreen(),
+       arguments: Get.arguments,
     ),
     
     

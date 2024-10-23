@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/providers/auth_provider.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
+import 'package:flutter_application_elixirscore/providers/chat_provider.dart';
 import 'package:flutter_application_elixirscore/providers/health_provider.dart';
 import 'package:flutter_application_elixirscore/providers/loading_provider.dart';
 import 'package:get/get.dart';
@@ -31,6 +32,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => BasicInfoProvider()),
         ChangeNotifierProvider(create: (_) => HealthDataProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
       ],
      
        

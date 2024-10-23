@@ -35,7 +35,7 @@ class _SigninState extends State<Signin> {
     bool isLoggedIn = prefs.getBool('isLoggedIn') ?? false;
 
     if (isLoggedIn) {
-      Get.offAllNamed(AppRoutes.dashboard);
+      Get.offAllNamed(AppRoutes.chat);
     }
   }
 

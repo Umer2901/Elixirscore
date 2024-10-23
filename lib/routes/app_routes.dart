@@ -14,6 +14,7 @@ abstract class AppRoutes {
   static const String updatebasicinfo = '/UpdateBasicInfo';
   static const String accountinfo = '/AccountInfo';
   static const String contact = '/ExperienceForm';
+  static const String chat = '/ChatScreen';
 
  
   
