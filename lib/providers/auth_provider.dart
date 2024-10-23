@@ -41,7 +41,7 @@ Future<void> _setLoginStatus(bool status) async {
       final phoneNumber = _user!.phoneNumber;
 
 
-        Get.toNamed(AppRoutes.permission);
+        Get.toNamed(AppRoutes.basicinfo);
     
     }
 
@@ -82,7 +82,7 @@ Future<void> _setLoginStatus(bool status) async {
       final phoneNumber = _user!.phoneNumber;
 
      
-         Get.toNamed(AppRoutes.permission);
+         Get.toNamed(AppRoutes.basicinfo);
    
     }
 
@@ -116,7 +116,7 @@ Future<void> signInWithApple(BuildContext context) async {
       final phoneNumber = _user!.phoneNumber;
 
     
-        Get.toNamed(AppRoutes.permission);
+        Get.toNamed(AppRoutes.basicinfo);
       
     }
 

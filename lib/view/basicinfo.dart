@@ -13,11 +13,11 @@ class BasicInfo extends StatefulWidget {
   @override
   State<BasicInfo> createState() => _BasicInfoState();
 }
-//done
+
 class _BasicInfoState extends State<BasicInfo> {
   String selectedGender = '';
   double age = 12;
-  double height = 4;
+  double height = 5.0; // Set default height to 5 feet
   double weight = 50;
 
   @override
@@ -54,12 +54,7 @@ class _BasicInfoState extends State<BasicInfo> {
                   });
                 }),
                 SizedBox(height: 3.h),
-               _buildSlider('Height', 4, 8, height, (value) {
-  setState(() {
-    height = value;
-  });
-}, divisions: 40),
-
+                _buildHeightSlider(),
                 SizedBox(height: 3.h),
                 _buildSlider('Weight', 50, 300, weight, (value) {
                   setState(() {
@@ -136,50 +131,103 @@ class _BasicInfoState extends State<BasicInfo> {
     );
   }
 
-Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged, {int? divisions}) {
-  return Column(
-    crossAxisAlignment: CrossAxisAlignment.start,
-    children: [
-      Text(
-        label,
-        style: Theme.of(context).textTheme.headlineMedium,
-      ),
-      SliderTheme(
-        data: SliderTheme.of(context).copyWith(
-          activeTrackColor: AppColors.grey,
-          inactiveTrackColor: AppColors.grey,
-          thumbColor: AppColors.primary,
-          valueIndicatorColor: Colors.black,
+  Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged, {int? divisions}) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: Theme.of(context).textTheme.headlineMedium,
         ),
-        child: Slider(
-          value: value,
-          min: min,
-          max: max,
-          divisions: divisions ?? (max - min).toInt(), // Default to (max - min) divisions if not provided
-          label: value.toStringAsFixed(1), // Show only 1 decimal point
-          onChanged: (double newValue) {
-            onChanged(newValue);
-          },
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: AppColors.grey,
+            inactiveTrackColor: AppColors.grey,
+            thumbColor: AppColors.primary,
+            valueIndicatorColor: Colors.black,
+          ),
+          child: Slider(
+            value: value,
+            min: min,
+            max: max,
+            divisions: divisions ?? (max - min).toInt(),
+            label: value.toStringAsFixed(1),
+            onChanged: (double newValue) {
+              onChanged(newValue);
+            },
+          ),
         ),
-      ),
-      Padding(
-        padding: const EdgeInsets.only(left: 10, right: 10),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              min.toString(),
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-            Text(
-              max.toString(),
-              style: Theme.of(context).textTheme.bodyLarge,
-            ),
-          ],
+        Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                min.toString(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                max.toString(),
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
 
+  Widget _buildHeightSlider() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Height',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: AppColors.grey,
+            inactiveTrackColor: AppColors.grey,
+            thumbColor: AppColors.primary,
+            valueIndicatorColor: Colors.black,
+          ),
+          child: Slider(
+            value: height,
+            min: 4,
+            max: 7,
+            divisions: (7 - 4) * 12, // 12 divisions per foot for inches
+            label: _formatHeight(height),
+            onChanged: (double newValue) {
+              setState(() {
+                height = newValue;
+              });
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '4\'0"',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                '7\'0"',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatHeight(double value) {
+    int feet = value.floor();
+    int inches = ((value - feet) * 12).round();
+    return '${feet}\'${inches}"';
+  }
 }

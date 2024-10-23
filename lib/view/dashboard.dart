@@ -4,6 +4,7 @@ import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/fonts.dart';
 import 'package:flutter_application_elixirscore/providers/basic_info_provider.dart';
 import 'package:flutter_application_elixirscore/providers/health_provider.dart';
+import 'package:flutter_application_elixirscore/providers/loading_provider.dart';
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/chat.dart';
 import 'package:flutter_application_elixirscore/view/widget/custom_buttons.dart';
@@ -24,13 +25,12 @@ class Dashboard extends StatefulWidget {
 class _DashboardState extends State<Dashboard> {
   static const platform = MethodChannel('com.elixir.elixirscore/deviceActivity'); // MethodChannel for native communication
   String _errorMessage = '';
-
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       fetchData();
-      _startMonitoring();
+    //  _startMonitoring();
     });
   }
 
@@ -46,47 +46,59 @@ class _DashboardState extends State<Dashboard> {
   }
 
   // Start screen time monitoring and request permission if needed
-  Future<void> _startMonitoring() async {
-    try {
-      await platform.invokeMethod('startMonitoring');
-      print("Screen time monitoring started.");
-      _getUsageData(); // Fetch initial screen time usage data
-    } on PlatformException catch (e) {
-      print("Failed to start monitoring: '${e.message}'.");
-    }
-  }
+  //      Future<void> _startMonitoring() async {
+  //   try {
+  //     await platform.invokeMethod('startMonitoring');
+  //     print("Screen time monitoring started.");
+  //     _getUsageData(); // Fetch initial screen time usage data
+  //   } on PlatformException catch (e) {
+  //     print("Failed to start monitoring: '${e.message}'.");
+  //   }
+  // }
 
-  // Get the screen time usage data and update the HealthDataProvider
-  Future<void> _getUsageData() async {
-    try {
-      final String usage = await platform.invokeMethod('getUsageData');
-      print("Retrieved screen time: $usage");
+  // // Get the screen time usage data and update the HealthDataProvider
+  // Future<void> _getUsageData() async {
+  //   try {
+  //     final String usage = await platform.invokeMethod('getUsageData');
+  //     print("Retrieved screen time: $usage");
 
-      // Assuming the usage data is in minutes, convert to a double value
-      double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
+  //     // Assuming the usage data is in minutes, convert to a double value
+  //     double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
 
-      // Update the HealthDataProvider with the screen time value
-      Provider.of<HealthDataProvider>(context, listen: false).screenTime = screenTime;
-      Provider.of<HealthDataProvider>(context, listen: false).screenTimeScore =
-      Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
+  //     // Update the HealthDataProvider with the screen time value
+  //     Provider.of<HealthDataProvider>(context, listen: false).screenTime = screenTime;
+  //     Provider.of<HealthDataProvider>(context, listen: false).screenTimeScore =
+  //     Provider.of<HealthDataProvider>(context, listen: false).calculateScreenTimeScore(screenTime);
 
-      // Notify listeners to update UI or data dependencies
-      Provider.of<HealthDataProvider>(context, listen: false).notifyListeners();
-    } on PlatformException catch (e) {
-      print("Failed to get usage data: '${e.message}'.");
-    }
-  }
-
+  //     // Notify listeners to update UI or data dependencies
+  //     Provider.of<HealthDataProvider>(context, listen: false).notifyListeners();
+  //   } on PlatformException catch (e) {
+  //     print("Failed to get usage data: '${e.message}'.");
+  //   }
+  // }
   @override
   Widget build(BuildContext context) {
+     final basicInfoProvider = Provider.of<BasicInfoProvider>(context, listen: false);
+     final loadingprovider = Provider.of<LoadingProvider>(context);
     return Consumer<HealthDataProvider>(
       builder: (context, provider, child) {
         final basicInfoProvider = Provider.of<BasicInfoProvider>(context, listen: false);
         double elixirScore = calculateElixirScore(provider);
 
         return Sizer(builder: (context, orientation, deviceType) {
+          
           return Scaffold(
             appBar: AppBar(
+            title: Center(
+                      child: Text(
+                        'ElixirScore',
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                              fontFamily: AppFont.nexaBold,
+                              fontSize: 25.sp,
+                            ),
+                      ),
+                    ),
+                    
              scrolledUnderElevation: 0.0,
              forceMaterialTransparency: true,
 surfaceTintColor: Colors.transparent,
@@ -99,21 +111,43 @@ surfaceTintColor: Colors.transparent,
                 icon: const Icon(Icons.person_2_outlined),
               ),
               actions: <Widget>[
-                IconButton(
-                  icon: const Icon(Icons.comment),
-                  tooltip: 'Comment Icon',
-                     onPressed: () async {
-            await basicInfoProvider.loadBasicInfo();
-            if (basicInfoProvider.basicInfo != null) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => ChatScreen(uid: basicInfoProvider.basicInfo!.uid),
-                ),
-              );
-            }
-          },
-                ),
+                
+            Padding(
+  padding: EdgeInsets.only(right: 7.sp), 
+  child: GestureDetector(
+    onTap: () async {
+      await basicInfoProvider.loadBasicInfo();
+      if (basicInfoProvider.basicInfo != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => ChatScreen(uid: basicInfoProvider.basicInfo!.uid),
+          ),
+        );
+      }
+    },
+    child: Image.asset(
+      'assets/images/icon.png',
+      height: 25.sp,
+    ),
+  ),
+)
+
+            //     IconButton(
+            //       icon: const Icon(Icons.comment),
+            //       tooltip: 'Comment Icon',
+            //         onPressed: () async {
+            // await basicInfoProvider.loadBasicInfo();
+            // if (basicInfoProvider.basicInfo != null) {
+            //   Navigator.push(
+            //     context,
+            //     MaterialPageRoute(
+            //       builder: (context) => ChatScreen(uid: basicInfoProvider.basicInfo!.uid),
+            //     ),
+            //   );
+          //   }
+          // },
+          //       ),
               ],
             ),
             body: SingleChildScrollView(
@@ -122,15 +156,7 @@ surfaceTintColor: Colors.transparent,
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Center(
-                      child: Text(
-                        'ElixirScore',
-                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                              fontFamily: AppFont.nexaBold,
-                              fontSize: 30.sp,
-                            ),
-                      ),
-                    ),
+                   
                     SizedBox(height: 2.h),
                     Center(
                       child: SemicircularIndicator(
@@ -195,15 +221,26 @@ surfaceTintColor: Colors.transparent,
                             ),
                           ],
                         ),
-                        CustomButton(
-                          height: 5.h,
-                          width: 30.w,
-                          label: "Sync",
-                          onPressed: () {
-                            provider.fetchHealthData(); // Fetch the latest health data
-                            _startMonitoring(); // Start monitoring screen time data
-                          },
-                        ),
+                       CustomButton(
+  height: 5.h,
+  width: 30.w,
+  label: loadingprovider.isLoading ? "Syncing..." : "Sync", 
+  isLoading: loadingprovider.isLoading, 
+  onPressed: 
+    () async {
+         
+           loadingprovider.setLoading(true);
+
+          await provider.fetchHealthData(); 
+
+          setState(() {
+            loadingprovider.setLoading(false);
+          });
+        },
+),
+
+
+                      
                       ],
                     ),
                     SizedBox(height: 2.h),
@@ -222,6 +259,10 @@ surfaceTintColor: Colors.transparent,
    Widget buildMetricsSection(BuildContext context, HealthDataProvider provider) {
     return Column(
       children: [
+          buildMetricSection(context, "Heart ❤️", "Heart Rate", provider.heartRate, provider.heartScore),
+        SizedBox(
+          height: 1.h,
+        ),
         buildMetricSection(context, "BMI 🥣️", "BMI", provider.bmi, provider.bmiScore),
         SizedBox(
           height: 1.h,
@@ -234,17 +275,14 @@ surfaceTintColor: Colors.transparent,
         SizedBox(
           height: 1.h,
         ),
-        buildMetricSection(context, "Heart ❤️", "Heart Rate", provider.heartRate, provider.heartScore),
-        SizedBox(
-          height: 1.h,
-        ),
+      
         buildMetricSection(context, "Respiration 🫁️", "Respiration", provider.respiration, provider.respirationScore),
-         SizedBox(
-          height: 1.h,
-        ),
-        buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
+       //  SizedBox(
+       //   height: 1.h,
+        //),
+       // buildMetricSection(context, "Screen Time 📱️", "Screen Time", provider.screenTime, provider.screenTimeScore),
         SizedBox(
-          height: 1.h,
+        height: 1.h,
         ),
         buildMetricSection(context, "Sleep 🛏️️", "Sleep", provider.sleep, provider.sleepScore),
         SizedBox(
@@ -305,12 +343,12 @@ surfaceTintColor: Colors.transparent,
 
   double calculateElixirScore(HealthDataProvider provider) {
     // Apply weightages to each metric's score
-    double bmiWeightedScore = provider.bmiScore * 0.05; // 5% weightage
-    double dietWeightedScore = provider.dietScore * 0.10; // 10% weightage
+    double bmiWeightedScore = provider.bmiScore * 0.10; // 10% weightage
+    double dietWeightedScore = provider.dietScore * 0.15; // 10% weightage
     double energyBurnWeightedScore = provider.energyScore * 0.15; // 15% weightage
     double heartWeightedScore = provider.heartScore * 0.15; // 15% weightage
     double respirationWeightedScore = provider.respirationScore * 0.10; // 10% weightage
-    double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage
+   // double screenTimeWeightedScore = provider.screenTimeScore * 0.10; // 10% weightage cancel
     double sleepWeightedScore = provider.sleepScore * 0.20; // 20% weightage
     double stepsWeightedScore = provider.stepsScore * 0.15; // 15% weightage
 
@@ -320,7 +358,7 @@ surfaceTintColor: Colors.transparent,
         energyBurnWeightedScore +
         heartWeightedScore +
         respirationWeightedScore +
-        screenTimeWeightedScore +
+     //   screenTimeWeightedScore +
         sleepWeightedScore +
         stepsWeightedScore;
 

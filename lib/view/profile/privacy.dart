@@ -106,7 +106,7 @@ class Privacy extends StatelessWidget {
               ...buildSection('9. Contact Us', [
                 'If you have any questions or concerns about this Privacy Policy or our data practices, please contact us at:',
                 'Elixir',
-                'info@elixirscore.com'
+                'elixirlabs@icloud.com'
               ]),
             ],
           ),

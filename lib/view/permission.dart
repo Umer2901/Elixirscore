@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:health/health.dart';
 import 'package:sizer/sizer.dart';
-import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PermissionScreen extends StatefulWidget {
@@ -17,12 +16,9 @@ class PermissionScreen extends StatefulWidget {
 }
 
 class _PermissionScreenState extends State<PermissionScreen> {
-  static const platform = MethodChannel('com.elixir.elixirscore/deviceActivity');
-
   final Map<String, bool> permissions = {
     'Apple Health': false,
     'Notification': false,
-    'Screen Time': false,
   };
 
   @override
@@ -31,13 +27,16 @@ class _PermissionScreenState extends State<PermissionScreen> {
     _loadSavedPermissions();
   }
 
+  Future<void> _setLoginStatus(bool status) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isLoggedIn', status);
+  }
+
   Future<void> _loadSavedPermissions() async {
-    // Load permission states from SharedPreferences to maintain persistence
     final prefs = await SharedPreferences.getInstance();
     setState(() {
       permissions['Apple Health'] = prefs.getBool('Apple Health') ?? false;
       permissions['Notification'] = prefs.getBool('Notification') ?? false;
-      permissions['Screen Time'] = prefs.getBool('Screen Time') ?? false;
     });
     _checkInitialPermissions();
   }
@@ -54,9 +53,6 @@ class _PermissionScreenState extends State<PermissionScreen> {
     // Update permissions in SharedPreferences
     _savePermissionStatus('Apple Health', healthStatus);
     _savePermissionStatus('Notification', notificationStatus.isGranted);
-
-    // Check screen time permission through platform channel
-    await _getScreenTimePermissionStatus();
   }
 
   Future<void> _savePermissionStatus(String permissionKey, bool status) async {
@@ -64,45 +60,28 @@ class _PermissionScreenState extends State<PermissionScreen> {
     await prefs.setBool(permissionKey, status);
   }
 
-Future<bool> _checkHealthPermission() async {
-  // Define the list of HealthDataTypes you want to request permissions for
-  List<HealthDataType> healthDataTypes = [
-    HealthDataType.BODY_MASS_INDEX,
-    HealthDataType.ACTIVE_ENERGY_BURNED,
-    HealthDataType.STEPS,
-    HealthDataType.DIETARY_CARBS_CONSUMED, // Diet score
-    HealthDataType.RESTING_HEART_RATE,
-    HealthDataType.RESPIRATORY_RATE,
-    HealthDataType.SLEEP_IN_BED, // Sleep duration
-    HealthDataType.BODY_TEMPERATURE,
-  ];
+  Future<bool> _checkHealthPermission() async {
+    List<HealthDataType> healthDataTypes = [
+      HealthDataType.BODY_MASS_INDEX,
+      HealthDataType.ACTIVE_ENERGY_BURNED,
+      HealthDataType.STEPS,
+      HealthDataType.DIETARY_CARBS_CONSUMED, // Diet score
+      HealthDataType.RESTING_HEART_RATE,
+      HealthDataType.RESPIRATORY_RATE,
+      HealthDataType.SLEEP_IN_BED, // Sleep duration
+      HealthDataType.ELECTROCARDIOGRAM,
+       HealthDataType.BODY_TEMPERATURE,
+          ];
 
-  // Create a list of permissions corresponding to each HealthDataType
-  List<HealthDataAccess> permissions = List.filled(healthDataTypes.length, HealthDataAccess.READ);
+    List<HealthDataAccess> permissions = List.filled(healthDataTypes.length, HealthDataAccess.READ);
+    HealthFactory health = HealthFactory();
 
-  // Create a HealthFactory instance
-  HealthFactory health = HealthFactory();
+    bool accessGranted = await health.requestAuthorization(
+      healthDataTypes,
+      permissions: permissions,
+    );
 
-  // Request authorization for the specified data types
-  bool accessGranted = await health.requestAuthorization(
-    healthDataTypes,
-    permissions: permissions,
-  );
-
-  // Return the result of the permission request
-  return accessGranted;
-}
-
-  Future<void> _getScreenTimePermissionStatus() async {
-    try {
-      final bool isGranted = await platform.invokeMethod('isScreenTimeGranted');
-      setState(() {
-        permissions['Screen Time'] = isGranted;
-      });
-      _savePermissionStatus('Screen Time', isGranted);
-    } on PlatformException catch (e) {
-      print("Failed to get screen time permission status: '${e.message}'.");
-    }
+    return accessGranted;
   }
 
   Future<void> _showCustomBottomSheet(
@@ -189,39 +168,8 @@ Future<bool> _checkHealthPermission() async {
         });
         _savePermissionStatus('Notification', status.isGranted);
         break;
-      case 'Screen Time':
-        await _startScreenTimeMonitoring();
-        break;
       default:
         return;
-    }
-  }
-
-  Future<void> _startScreenTimeMonitoring() async {
-    try {
-      await platform.invokeMethod('startMonitoring');
-      print("Screen time monitoring started.");
-      setState(() {
-        permissions['Screen Time'] = true;
-      });
-      _savePermissionStatus('Screen Time', true);
-      _getUsageData(); // Fetch initial screen time usage data
-    } on PlatformException catch (e) {
-      print("Failed to start monitoring: '${e.message}'.");
-    }
-  }
-
-  Future<void> _getUsageData() async {
-    try {
-      final String usage = await platform.invokeMethod('getUsageData');
-      print("Retrieved screen time: $usage");
-      double screenTime = double.tryParse(usage.split(' ').first) ?? 0.0;
-      setState(() {
-        permissions['Screen Time'] = true; // Permission granted and data retrieved
-      });
-      _savePermissionStatus('Screen Time', true);
-    } on PlatformException catch (e) {
-      print("Failed to get usage data: '${e.message}'.");
     }
   }
 
@@ -266,13 +214,6 @@ Future<bool> _checkHealthPermission() async {
                       '🔔',
                       'To help you keep track of your health data over time, Health can alert you to significant changes in types of data like resting heart rate, number of steps, and amount of sleep. Trend lines show you how much these metrics have changed and for how long.',
                     ),
-                    SizedBox(height: 2.h),
-                    _buildPermissionCard(
-                      context,
-                      'Screen Time',
-                      '📱️',
-                      'Screen time is the amount of time spent using a device with a screen such as a smartphone, computer, television, video game console, or even a tablet. The concept is under significant research with related concepts in digital media use and mental health',
-                    ),
                   ],
                 ),
               ),
@@ -280,8 +221,9 @@ Future<bool> _checkHealthPermission() async {
           ),
         ),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {
+          onPressed: () async {
             if (_allPermissionsGranted()) {
+              await _setLoginStatus(true);
               Get.toNamed(AppRoutes.dashboard);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(

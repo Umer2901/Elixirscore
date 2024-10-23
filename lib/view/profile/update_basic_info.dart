@@ -17,7 +17,7 @@ class UpdateBasicInfo extends StatefulWidget {
 class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
   String selectedGender = '';
   double age = 12;
-  double height = 4;
+  double height = 5.0; // Set default height to 5 feet
   double weight = 50;
 
   @override
@@ -50,9 +50,7 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(
-                  height: 6.h,
-                ),
+                SizedBox(height: 6.h),
                 Padding(
                   padding: const EdgeInsets.all(5.0),
                   child: GestureDetector(
@@ -80,9 +78,7 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
                   'Update your basic information',
                   style: Theme.of(context).textTheme.displaySmall,
                 ),
-                SizedBox(
-                  height: 3.h,
-                ),
+                SizedBox(height: 3.h),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
@@ -97,18 +93,13 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
                   });
                 }),
                 SizedBox(height: 3.h),
-                // Updated height slider with more divisions for finer adjustments
-                _buildSlider('Height', 4, 8, height, (value) {
-                  setState(() {
-                    height = value;
-                  });
-                }, divisions: 40),
+                _buildHeightSlider(), // Updated height slider
                 SizedBox(height: 3.h),
                 _buildSlider('Weight', 50, 300, weight, (value) {
                   setState(() {
                     weight = value;
                   });
-                }, divisions: 50), // Added more divisions for weight too
+                }, divisions: 50), // Adjusted divisions for weight
               ],
             ),
           ),
@@ -168,9 +159,7 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
             ),
           ),
         ),
-        SizedBox(
-          height: 1.h,
-        ),
+        SizedBox(height: 1.h),
         Text(
           gender == 'male' ? "Male" : "Female",
           style: Theme.of(context).textTheme.headlineSmall,
@@ -179,7 +168,6 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
     );
   }
 
-  // Modified _buildSlider to accept optional divisions parameter
   Widget _buildSlider(String label, double min, double max, double value, Function(double) onChanged, {int? divisions}) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -199,8 +187,8 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
             value: value,
             min: min,
             max: max,
-            divisions: divisions ?? (max - min).toInt(), // Set divisions based on input or default to (max - min)
-            label: value.toStringAsFixed(1), // Display only 1 decimal place
+            divisions: divisions ?? (max - min).toInt(),
+            label: value.toStringAsFixed(1),
             onChanged: (double newValue) {
               onChanged(newValue);
             },
@@ -224,5 +212,59 @@ class _UpdateBasicInfoState extends State<UpdateBasicInfo> {
         ),
       ],
     );
+  }
+
+  Widget _buildHeightSlider() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Height',
+          style: Theme.of(context).textTheme.headlineMedium,
+        ),
+        SliderTheme(
+          data: SliderTheme.of(context).copyWith(
+            activeTrackColor: AppColors.grey,
+            inactiveTrackColor: AppColors.grey,
+            thumbColor: AppColors.primary,
+            valueIndicatorColor: Colors.black,
+          ),
+          child: Slider(
+            value: height,
+            min: 4,
+            max: 7,
+            divisions: (7 - 4) * 12, // 12 divisions per foot for inch precision
+            label: _formatHeight(height),
+            onChanged: (double newValue) {
+              setState(() {
+                height = newValue;
+              });
+            },
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(left: 10, right: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                '4\'0"',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+              Text(
+                '7\'0"',
+                style: Theme.of(context).textTheme.bodyLarge,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  String _formatHeight(double value) {
+    int feet = value.floor();
+    int inches = ((value - feet) * 12).round();
+    return '${feet}\'${inches}"';
   }
 }

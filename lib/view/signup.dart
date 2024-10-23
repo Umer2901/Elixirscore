@@ -27,10 +27,7 @@ class _SignupState extends State<Signup> {
   bool _obsecureConfirmPassword = true;
   bool isLoading = false;
 
-  Future<void> _setLoginStatus(bool status) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isLoggedIn', status);
-  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -136,7 +133,7 @@ class _SignupState extends State<Signup> {
                         );
 
                         if (authProvider.user != null) {
-                          await _setLoginStatus(true);
+                         // await _setLoginStatus(true);
                          // Get.offAndToNamed(AppRoutes.dashboard);
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(

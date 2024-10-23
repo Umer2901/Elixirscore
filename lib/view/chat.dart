@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter_application_elixirscore/constants/colors.dart';
 import 'package:flutter_application_elixirscore/constants/key.dart';
 import 'package:flutter_application_elixirscore/providers/chat_services.dart';
 import 'package:flutter_application_elixirscore/constants/images.dart';
@@ -138,9 +139,8 @@ class _ChatScreenState extends State<ChatScreen> with SingleTickerProviderStateM
           },
         ),
         title: Image.asset(
-          'assets/images/eye.png',
-          height: 30,
-          color: Colors.red,
+          'assets/images/logo.png',
+          height: 40,
         ),
         centerTitle: true,
         actions: [
