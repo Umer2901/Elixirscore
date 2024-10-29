@@ -123,7 +123,7 @@ surfaceTintColor: Colors.transparent,
       }
     },
     child: Image.asset(
-     AppImages.bluelogo,
+     AppImages.blue_icon,
       height: 25.sp,
     ),
   ),

@@ -6,5 +6,6 @@ class AppImages {
   static const male = "assets/images/male.png";
   static const female = "assets/images/female.png";
   static const fat = "assets/images/fat.png";
-  static const bluelogo = "assets/images/blue_icon.png";
+  static const blue_icon = "assets/images/blue_icon.png";
+  static const color_score = "assets/images/color_score.png";
 }
