@@ -7,4 +7,5 @@ class AppImages {
   static const female = "assets/images/female.png";
   static const fat = "assets/images/fat.png";
   static const bluelogo = "assets/images/blue_logo.png";
+  static const walk = "assets/images/walk.png";
 }

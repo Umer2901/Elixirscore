@@ -3,9 +3,10 @@
 
 import 'package:flutter_application_elixirscore/routes/app_routes.dart';
 import 'package:flutter_application_elixirscore/view/basicinfo.dart';
-import 'package:flutter_application_elixirscore/view/chat.dart';
-import 'package:flutter_application_elixirscore/view/dashboard.dart';
+import 'package:flutter_application_elixirscore/view/home/chat.dart';
+import 'package:flutter_application_elixirscore/view/home/dashboard.dart';
 import 'package:flutter_application_elixirscore/view/forgot.dart';
+import 'package:flutter_application_elixirscore/view/home/home.dart';
 import 'package:flutter_application_elixirscore/view/otp.dart';
 import 'package:flutter_application_elixirscore/view/permission.dart';
 import 'package:flutter_application_elixirscore/view/phoneauth.dart';
@@ -87,6 +88,10 @@ class AppPages extends AppRoutes {
       name: AppRoutes.chat,
       page: () =>  ChatScreen(),
        arguments: Get.arguments,
+    ),
+    GetPage(
+      name: AppRoutes.home,
+      page: () =>  Home(),
     ),
     
     

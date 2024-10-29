@@ -224,7 +224,7 @@ class _PermissionScreenState extends State<PermissionScreen> {
           onPressed: () async {
             if (_allPermissionsGranted()) {
               await _setLoginStatus(true);
-              Get.toNamed(AppRoutes.chat);
+              Get.toNamed(AppRoutes.home);
             } else {
               ScaffoldMessenger.of(context).showSnackBar(
                 const SnackBar(content: Text('Please enable all permissions before proceeding.')),
